@@ -1224,11 +1224,13 @@ function Footer() {
                   href="mailto:hello@alexcarter.la"
                   className="inline-flex items-center gap-2 hover:text-ember transition-colors"
                 >
-                  <Mail className="size-4" /> hello@alexcarter.la
+                  <Mail className="size-4" />
+                  <span>hello@alexcarter.la</span>
                 </a>
               </li>
               <li className="inline-flex items-center gap-2 text-muted-foreground">
-                <MapPin className="size-4" /> Los Angeles, CA
+                <MapPin className="size-4" />
+                <span>Los Angeles, CA</span>
               </li>
             </ul>
           </div>
