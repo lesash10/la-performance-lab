@@ -85,6 +85,17 @@
     color-scheme: dark;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* In-page anchors: offset for fixed header */
+  section[id] {
+    scroll-margin-top: 6rem;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -120,14 +131,20 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
+  /* Film grain: low opacity, GPU layer, no pointer hit targets */
+  .grain {
+    pointer-events: none;
+  }
   .grain::before {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 0;
     pointer-events: none;
-    opacity: 0.04;
+    opacity: 0.035;
     mix-blend-mode: overlay;
-    background-image: radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px);
+    transform: translateZ(0);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.55) 1px, transparent 1px);
     background-size: 3px 3px;
   }
 }

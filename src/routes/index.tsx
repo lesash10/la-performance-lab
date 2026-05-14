@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
@@ -55,6 +55,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -69,11 +70,20 @@ const NAV = [
   { href: "#booking", label: "Book" },
 ];
 
+const MOBILE_NAV_PANEL_ID = "site-mobile-nav-panel";
+
 function LandingPage() {
   return (
     <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      <a
+        href="#top"
+        className="absolute left-1/2 top-0 z-[100] -translate-x-1/2 -translate-y-full rounded-md bg-background px-4 py-2.5 text-sm font-medium text-foreground shadow-lg ring-2 ring-ring transition-transform duration-200 focus:translate-y-4 focus:outline-none motion-reduce:transition-none"
+      >
+        Skip to main content
+      </a>
       <Nav />
       <Hero />
+      <StickyMobileBookingCta />
       <SocialProof />
       <Services />
       <WhyAlex />
@@ -91,6 +101,8 @@ function LandingPage() {
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileNavFirstLinkRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -98,6 +110,23 @@ function Nav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      setOpen(false);
+      queueMicrotask(() => menuButtonRef.current?.focus());
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    queueMicrotask(() => mobileNavFirstLinkRef.current?.focus());
+  }, [open]);
 
   return (
     <header
@@ -109,7 +138,10 @@ function Nav() {
       )}
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8 flex items-center justify-between">
-        <a href="#top" className="flex items-center gap-2 group">
+        <a
+          href="#top"
+          className="flex items-center gap-2 group rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
           <span className="size-8 rounded-md bg-gradient-to-br from-ember to-ember-glow grid place-items-center shadow-ember">
             <Flame className="size-4 text-background" strokeWidth={2.5} />
           </span>
@@ -123,7 +155,7 @@ function Nav() {
             <a
               key={n.href}
               href={n.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {n.label}
             </a>
@@ -131,41 +163,57 @@ function Nav() {
         </nav>
 
         <div className="hidden md:block">
-          <a href="#booking">
-            <Button className="bg-ember hover:bg-ember/90 text-background font-medium rounded-full px-5 h-10 shadow-ember">
+          <Button
+            asChild
+            className="bg-ember hover:bg-ember/90 text-background font-medium rounded-full px-5 h-10 shadow-ember"
+          >
+            <a href="#booking">
               Book Session
               <ArrowRight className="size-4" />
-            </Button>
-          </a>
+            </a>
+          </Button>
         </div>
 
         <button
-          className="md:hidden size-10 grid place-items-center rounded-md border border-border/60"
+          ref={menuButtonRef}
+          type="button"
+          className="md:hidden size-10 grid place-items-center rounded-md border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          aria-controls={MOBILE_NAV_PANEL_ID}
         >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
         </button>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
+        <div
+          id={MOBILE_NAV_PANEL_ID}
+          role="navigation"
+          aria-label="Mobile site navigation"
+          className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl"
+        >
           <div className="px-5 py-4 flex flex-col gap-3">
-            {NAV.map((n) => (
+            {NAV.map((n, i) => (
               <a
                 key={n.href}
+                ref={i === 0 ? mobileNavFirstLinkRef : undefined}
                 href={n.href}
                 onClick={() => setOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground py-2"
+                className="text-sm text-muted-foreground hover:text-foreground py-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {n.label}
               </a>
             ))}
-            <a href="#booking" onClick={() => setOpen(false)}>
-              <Button className="w-full bg-ember hover:bg-ember/90 text-background rounded-full">
+            <Button
+              asChild
+              className="w-full bg-ember hover:bg-ember/90 text-background rounded-full"
+            >
+              <a href="#booking" onClick={() => setOpen(false)}>
                 Book Session
-              </Button>
-            </a>
+              </a>
+            </Button>
           </div>
         </div>
       )}
@@ -175,33 +223,51 @@ function Nav() {
 
 /* ---------------- Hero ---------------- */
 function Hero() {
+  const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, 120]);
   const opacity = useTransform(scrollY, [0, 400], [1, 0.5]);
 
+  const heroLayers = (
+    <>
+      <img
+        src={heroImg}
+        alt="Personal trainer Alex Carter performing strength training in Los Angeles"
+        width={1920}
+        height={1080}
+        sizes="100vw"
+        decoding="async"
+        fetchPriority="high"
+        className="size-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+      <div className="grain absolute inset-0" aria-hidden />
+    </>
+  );
+
+  const heroTextProps = reduceMotion
+    ? { initial: false as const }
+    : {
+        initial: { opacity: 0, y: 24 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.7, ease: "easeOut" as const },
+      };
+
   return (
     <section id="top" className="relative min-h-[100svh] flex items-center pt-28 pb-24">
-      <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10">
-        <img
-          src={heroImg}
-          alt="Personal trainer Alex Carter performing strength training in Los Angeles"
-          width={1920}
-          height={1080}
-          className="size-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-      </motion.div>
+      {reduceMotion ? (
+        <div className="absolute inset-0 -z-10">{heroLayers}</div>
+      ) : (
+        <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10">
+          {heroLayers}
+        </motion.div>
+      )}
 
       <div className="mx-auto max-w-7xl px-5 md:px-8 w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="max-w-3xl"
-        >
+        <motion.div {...heroTextProps} className="max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface/60 backdrop-blur px-3 py-1.5 text-xs text-muted-foreground mb-8">
-            <span className="size-1.5 rounded-full bg-ember animate-pulse" />
+            <span className="size-1.5 rounded-full bg-ember motion-safe:animate-pulse" />
             Now coaching in Los Angeles · Limited spots
           </div>
 
@@ -212,30 +278,39 @@ function Hero() {
           </h1>
 
           <p className="mt-7 max-w-xl text-base md:text-lg text-muted-foreground text-pretty leading-relaxed">
-            Premium indoor &amp; outdoor coaching for expats and busy
-            professionals in Los Angeles. Built around your schedule, your
-            goals, and the way you actually live.
+            Premium indoor &amp; outdoor coaching for expats and busy professionals in Los Angeles.
+            Built around your schedule, your goals, and the way you actually live.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3">
-            <a href="#booking">
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:items-start">
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
               <Button
+                asChild
                 size="lg"
                 className="h-12 rounded-full bg-ember hover:bg-ember/90 text-background font-medium px-7 shadow-ember w-full sm:w-auto"
               >
-                Book Your Session
-                <ArrowRight className="size-4" />
+                <a href="#booking">
+                  Book Your Session
+                  <ArrowRight className="size-4" />
+                </a>
               </Button>
-            </a>
-            <a href="#booking">
+              <p className="text-xs text-muted-foreground max-w-[14rem] leading-snug px-1">
+                Jump to the form — lock in preferred day and time with your request.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
               <Button
+                asChild
                 size="lg"
                 variant="outline"
                 className="h-12 rounded-full border-border/80 bg-surface/40 backdrop-blur hover:bg-surface px-7 w-full sm:w-auto"
               >
-                Free Consultation
+                <a href="#booking-consult">Free Consultation</a>
               </Button>
-            </a>
+              <p className="text-xs text-muted-foreground max-w-[14rem] leading-snug px-1">
+                Same form — opens on your message so you can ask questions before you commit.
+              </p>
+            </div>
           </div>
 
           <div className="mt-14 grid grid-cols-3 gap-6 max-w-lg">
@@ -245,9 +320,7 @@ function Hero() {
               { k: "1:1", v: "Personalized plans" },
             ].map((s) => (
               <div key={s.k}>
-                <div className="font-display text-2xl md:text-3xl font-semibold">
-                  {s.k}
-                </div>
+                <div className="font-display text-2xl md:text-3xl font-semibold">{s.k}</div>
                 <div className="text-xs text-muted-foreground mt-1">{s.v}</div>
               </div>
             ))}
@@ -255,6 +328,87 @@ function Hero() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+const STICKY_BOOKING_DISMISS_KEY = "lab-sticky-booking-dismiss";
+
+/** Compact mobile-only CTA after the hero; hides near #booking or when dismissed. */
+function StickyMobileBookingCta() {
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return sessionStorage.getItem(STICKY_BOOKING_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const update = () => {
+      const hero = document.getElementById("top");
+      const booking = document.getElementById("booking");
+      const vh = window.innerHeight;
+      let pastHero = false;
+      if (hero) {
+        pastHero = hero.getBoundingClientRect().bottom < vh * 0.22;
+      } else {
+        pastHero = window.scrollY > vh * 0.55;
+      }
+      let bookingOnScreen = false;
+      if (booking) {
+        const br = booking.getBoundingClientRect();
+        bookingOnScreen = br.top < vh * 0.88 && br.bottom > vh * 0.12;
+      }
+      setVisible(pastHero && !bookingOnScreen);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const dismiss = () => {
+    try {
+      sessionStorage.setItem(STICKY_BOOKING_DISMISS_KEY, "1");
+    } catch {
+      /* ignore quota / private mode */
+    }
+    setDismissed(true);
+  };
+
+  if (dismissed) return null;
+
+  return (
+    <div
+      className={cn(
+        "md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 transition-[opacity,transform] duration-300 ease-out",
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
+      )}
+      aria-hidden={!visible}
+    >
+      <div className="mx-auto max-w-lg flex items-stretch gap-2 rounded-2xl border border-border/70 bg-background/95 backdrop-blur-xl shadow-lg shadow-black/20 p-2 pl-3">
+        <a
+          href="#booking"
+          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-ember px-4 py-3 text-sm font-medium text-background shadow-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          Book session
+          <ArrowRight className="size-4 shrink-0" aria-hidden />
+        </a>
+        <button
+          type="button"
+          onClick={dismiss}
+          className="shrink-0 grid place-items-center size-11 rounded-xl border border-border/60 text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          aria-label="Dismiss booking shortcut"
+        >
+          <X className="size-5" aria-hidden />
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -268,6 +422,10 @@ function Reveal({
   delay?: number;
   className?: string;
 }) {
+  const reduceMotion = useReducedMotion();
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -304,20 +462,19 @@ function SocialProof() {
       img: t2,
       name: "Camille L.",
       role: "Marketing lead · France",
-      quote:
-        "Sessions fit around insane meeting weeks. I show up, I leave stronger. That simple.",
+      quote: "Sessions fit around insane meeting weeks. I show up, I leave stronger. That simple.",
     },
     {
       img: t3,
       name: "Daniel R.",
       role: "Investor · Brazil",
-      quote:
-        "The most professional trainer I've worked with in any city. Worth every minute.",
+      quote: "The most professional trainer I've worked with in any city. Worth every minute.",
     },
   ];
   return (
-    <section className="py-24 md:py-32 relative">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section className="relative overflow-hidden py-24 md:py-32">
+      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
             <div>
@@ -327,16 +484,15 @@ function SocialProof() {
               </h2>
             </div>
             <p className="text-muted-foreground max-w-sm">
-              From founders to creatives, clients keep training with Alex
-              because the system works.
+              From founders to creatives, clients keep training with Alex because the system works.
             </p>
           </div>
         </Reveal>
 
         <div className="grid sm:grid-cols-3 gap-4 mb-12">
           {[
-            { k: "100+", v: "Sessions completed" },
-            { k: "12", v: "Nationalities trained" },
+            { k: "100+", v: "Sessions delivered" },
+            { k: "12+", v: "Nationalities coached" },
             { k: "4.9★", v: "Average client rating" },
           ].map((s, i) => (
             <Reveal key={s.k} delay={i * 0.05}>
@@ -367,9 +523,7 @@ function SocialProof() {
                 </div>
                 <div className="p-6">
                   <Quote className="size-5 text-ember mb-3" />
-                  <p className="text-sm leading-relaxed text-foreground/90">
-                    {t.quote}
-                  </p>
+                  <p className="text-sm leading-relaxed text-foreground/90">{t.quote}</p>
                   <div className="mt-5 pt-5 border-t border-border/60 flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium">{t.name}</div>
@@ -414,8 +568,9 @@ function Services() {
   ];
 
   return (
-    <section id="services" className="py-24 md:py-32 relative bg-surface/30">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section id="services" className="relative overflow-hidden bg-surface/30 py-24 md:py-32">
+      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="max-w-2xl mb-14">
             <Eyebrow>Services</Eyebrow>
@@ -444,12 +599,8 @@ function Services() {
                   </div>
                 </div>
                 <div className="p-7">
-                  <h3 className="font-display text-2xl font-semibold tracking-tight">
-                    {s.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                    {s.desc}
-                  </p>
+                  <h3 className="font-display text-2xl font-semibold tracking-tight">{s.title}</h3>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                   <ul className="mt-5 space-y-2">
                     {s.benefits.map((b) => (
                       <li key={b} className="flex items-center gap-2 text-sm">
@@ -458,15 +609,16 @@ function Services() {
                       </li>
                     ))}
                   </ul>
-                  <a href="#booking" className="block mt-7">
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-full border-border/80 bg-transparent hover:bg-ember hover:text-background hover:border-ember transition-colors"
-                    >
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="mt-7 w-full rounded-full border-border/80 bg-transparent hover:bg-ember hover:text-background hover:border-ember transition-colors"
+                  >
+                    <a href="#booking">
                       Book this session
                       <ArrowRight className="size-4" />
-                    </Button>
-                  </a>
+                    </a>
+                  </Button>
                 </div>
               </div>
             </Reveal>
@@ -480,12 +632,36 @@ function Services() {
 /* ---------------- Why Alex ---------------- */
 function WhyAlex() {
   const items = [
-    { icon: Target, title: "Structured approach", desc: "Every session and week tied to a measurable goal." },
-    { icon: Timer, title: "Efficient sessions", desc: "45–75 min training designed around your calendar." },
-    { icon: ShieldCheck, title: "Real accountability", desc: "Weekly check-ins. No drift. No excuses." },
-    { icon: MapPin, title: "Flexible locations", desc: "Indoor, outdoor, your gym — wherever you train best." },
-    { icon: Globe2, title: "Built for expats", desc: "International communication, no local-jargon coaching." },
-    { icon: LineChart, title: "Progression tracking", desc: "Numbers, photos, and lifts — measured every block." },
+    {
+      icon: Target,
+      title: "Structured approach",
+      desc: "Every session and week tied to a measurable goal.",
+    },
+    {
+      icon: Timer,
+      title: "Efficient sessions",
+      desc: "45–75 min training designed around your calendar.",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Real accountability",
+      desc: "Weekly check-ins. No drift. No excuses.",
+    },
+    {
+      icon: MapPin,
+      title: "Flexible locations",
+      desc: "Indoor, outdoor, your gym — wherever you train best.",
+    },
+    {
+      icon: Globe2,
+      title: "Built for expats",
+      desc: "International communication, no local-jargon coaching.",
+    },
+    {
+      icon: LineChart,
+      title: "Progression tracking",
+      desc: "Numbers, photos, and lifts — measured every block.",
+    },
   ];
   return (
     <section id="why" className="py-24 md:py-32 relative">
@@ -507,9 +683,7 @@ function WhyAlex() {
                   <it.icon className="size-5 text-ember" />
                 </div>
                 <h3 className="font-display text-xl font-semibold mt-5">{it.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  {it.desc}
-                </p>
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{it.desc}</p>
               </div>
             </Reveal>
           ))}
@@ -565,18 +739,19 @@ function Schedule() {
   ];
 
   return (
-    <section id="schedule" className="py-24 md:py-32 relative bg-surface/30">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section id="schedule" className="relative overflow-hidden bg-surface/30 py-24 md:py-32">
+      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
             <div>
               <Eyebrow>Schedule</Eyebrow>
               <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 max-w-xl text-balance">
-                Pick your session. Pick your slot.
+                Session types and example time windows.
               </h2>
             </div>
             <p className="text-muted-foreground max-w-sm">
-              Morning, lunch break, or evening — coaching that fits any day in LA.
+              Times shown are typical options; Alex confirms real availability when you book.
             </p>
           </div>
         </Reveal>
@@ -594,22 +769,16 @@ function Schedule() {
                       <h3 className="font-display text-xl md:text-2xl font-semibold leading-tight">
                         {c.title}
                       </h3>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {c.location}
-                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">{c.location}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-display text-lg font-semibold">
-                      {c.price}
-                    </div>
+                    <div className="font-display text-lg font-semibold">{c.price}</div>
                     <div className="text-xs text-muted-foreground">{c.duration}</div>
                   </div>
                 </div>
 
-                <p className="mt-5 text-sm text-muted-foreground leading-relaxed">
-                  {c.desc}
-                </p>
+                <p className="mt-5 text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
 
                 <div className="mt-5 flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full bg-surface border border-border px-3 py-1 text-muted-foreground">
@@ -622,13 +791,13 @@ function Schedule() {
 
                 <div className="mt-6">
                   <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                    Available slots
+                    Example time windows
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {c.slots.map((s) => (
                       <span
                         key={s}
-                        className="rounded-lg bg-surface-elevated border border-border px-3 py-1.5 text-sm font-medium hover:border-ember/60 hover:text-ember transition-colors cursor-pointer"
+                        className="rounded-lg bg-surface-elevated border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground"
                       >
                         {s}
                       </span>
@@ -636,12 +805,15 @@ function Schedule() {
                   </div>
                 </div>
 
-                <a href="#booking" className="block mt-7">
-                  <Button className="w-full rounded-full bg-ember hover:bg-ember/90 text-background h-11 shadow-ember">
+                <Button
+                  asChild
+                  className="mt-7 w-full rounded-full bg-ember hover:bg-ember/90 text-background h-11 shadow-ember"
+                >
+                  <a href="#booking">
                     Book This Session
                     <ArrowRight className="size-4" />
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </div>
             </Reveal>
           ))}
@@ -706,9 +878,8 @@ function Trust() {
               A coach built around clarity, safety, and real progress.
             </h2>
             <p className="mt-5 text-muted-foreground leading-relaxed max-w-lg">
-              No fads. No gimmicks. Just professional, structured coaching
-              tailored to your level — designed to deliver progress you can feel
-              and measure.
+              No fads. No gimmicks. Just professional, structured coaching tailored to your level —
+              designed to deliver progress you can feel and measure.
             </p>
 
             <ul className="mt-8 grid sm:grid-cols-2 gap-3">
@@ -792,12 +963,8 @@ function Logistics() {
                 <div className="size-11 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
                   <c.icon className="size-5 text-ember" />
                 </div>
-                <h3 className="font-display text-lg font-semibold mt-5">
-                  {c.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  {c.body}
-                </p>
+                <h3 className="font-display text-lg font-semibold mt-5">{c.title}</h3>
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{c.body}</p>
               </div>
             </Reveal>
           ))}
@@ -805,15 +972,16 @@ function Logistics() {
 
         <Reveal>
           <div className="mt-12 text-center">
-            <a href="#booking">
-              <Button
-                size="lg"
-                className="h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
-              >
+            <Button
+              asChild
+              size="lg"
+              className="h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
+            >
+              <a href="#booking">
                 Book Your First Session
                 <ArrowRight className="size-4" />
-              </Button>
-            </a>
+              </a>
+            </Button>
           </div>
         </Reveal>
       </div>
@@ -828,6 +996,8 @@ const formSchema = z.object({
   goal: z.string().min(1, "Pick a goal"),
   type: z.string().min(1, "Pick a training type"),
   message: z.string().optional(),
+  preferredDaySummary: z.string().min(1, "Pick a preferred day"),
+  preferredTimeSlot: z.string().min(1, "Pick a preferred time"),
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -836,12 +1006,7 @@ function Booking() {
   const [selectedDay, setSelectedDay] = useState(1);
   const [selectedSlot, setSelectedSlot] = useState("7:00 AM");
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", email: "", goal: "", type: "", message: "" },
-  });
-
-  const days = (() => {
+  const days = useMemo(() => {
     const today = new Date();
     return Array.from({ length: 7 }).map((_, i) => {
       const d = new Date(today);
@@ -852,13 +1017,54 @@ function Booking() {
         day: d.getDate(),
       };
     });
-  })();
+  }, []);
+
+  const initialPreferredDay = `${days[selectedDay]!.weekday} ${days[selectedDay]!.day}`;
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      goal: "",
+      type: "",
+      message: "",
+      preferredDaySummary: initialPreferredDay,
+      preferredTimeSlot: selectedSlot,
+    },
+  });
+
+  const { control, setValue } = form;
   const slots = ["6:30 AM", "7:00 AM", "12:30 PM", "5:30 PM", "6:30 PM", "7:00 PM"];
+
+  useEffect(() => {
+    const d = days[selectedDay];
+    if (!d) return;
+    setValue("preferredDaySummary", `${d.weekday} ${d.day}`, {
+      shouldValidate: true,
+    });
+    setValue("preferredTimeSlot", selectedSlot, { shouldValidate: true });
+  }, [selectedDay, selectedSlot, days, setValue]);
+
+  useEffect(() => {
+    if (submitted) return;
+    const focusMessageIfConsult = () => {
+      if (window.location.hash !== "#booking-consult") return;
+      const el = document.getElementById("message");
+      if (!(el instanceof HTMLTextAreaElement)) return;
+      queueMicrotask(() => {
+        el.focus({ preventScroll: false });
+      });
+    };
+    focusMessageIfConsult();
+    window.addEventListener("hashchange", focusMessageIfConsult);
+    return () => window.removeEventListener("hashchange", focusMessageIfConsult);
+  }, [submitted]);
 
   const onSubmit = (values: FormValues) => {
     setSubmitted(true);
     toast.success("Request received", {
-      description: `Thanks ${values.name.split(" ")[0]} — Alex will reply within 24 hours.`,
+      description: `Thanks ${values.name.split(" ")[0]} — Alex will confirm by email within 24 hours.`,
     });
   };
 
@@ -869,10 +1075,11 @@ function Booking() {
           <div className="max-w-2xl mb-14">
             <Eyebrow>Book your session</Eyebrow>
             <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
-              Pick a time. Tell Alex your goal. Start training.
+              Send a request with your goals and preferred times.
             </h2>
             <p className="mt-5 text-muted-foreground">
-              Response within 24 hours, every time. No bots, no chasing.
+              Alex confirms every booking personally — no instant holds or automated confirmation
+              emails.
             </p>
           </div>
         </Reveal>
@@ -884,13 +1091,14 @@ function Booking() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs uppercase tracking-widest text-muted-foreground">
-                    Pick a day
+                    Preferred day
                   </div>
-                  <div className="font-display text-lg font-semibold mt-1">
-                    Next 7 days
-                  </div>
+                  <div className="font-display text-lg font-semibold mt-1">Next 7 days</div>
+                  <p className="text-[11px] text-muted-foreground mt-1.5 max-w-[14rem] leading-snug">
+                    Illustrative week — final time is confirmed with Alex.
+                  </p>
                 </div>
-                <Calendar className="size-5 text-ember" />
+                <Calendar className="size-5 text-ember shrink-0" />
               </div>
 
               <div className="mt-6 grid grid-cols-7 gap-1.5">
@@ -900,7 +1108,7 @@ function Booking() {
                     type="button"
                     onClick={() => setSelectedDay(d.i)}
                     className={cn(
-                      "rounded-xl py-3 flex flex-col items-center border transition-all",
+                      "rounded-xl py-3 flex flex-col items-center border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       selectedDay === d.i
                         ? "bg-ember border-ember text-background shadow-ember"
                         : "bg-surface-elevated border-border hover:border-ember/40",
@@ -909,16 +1117,14 @@ function Booking() {
                     <span className="text-[10px] uppercase tracking-wider opacity-80">
                       {d.weekday}
                     </span>
-                    <span className="font-display text-lg font-semibold mt-0.5">
-                      {d.day}
-                    </span>
+                    <span className="font-display text-lg font-semibold mt-0.5">{d.day}</span>
                   </button>
                 ))}
               </div>
 
               <div className="mt-7">
                 <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                  Available times
+                  Typical session times
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {slots.map((s) => (
@@ -927,7 +1133,7 @@ function Booking() {
                       type="button"
                       onClick={() => setSelectedSlot(s)}
                       className={cn(
-                        "rounded-lg py-2.5 text-sm font-medium border transition-all",
+                        "rounded-lg py-2.5 text-sm font-medium border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         selectedSlot === s
                           ? "bg-ember/15 border-ember text-ember"
                           : "bg-surface-elevated border-border hover:border-ember/40",
@@ -944,14 +1150,11 @@ function Booking() {
                   <Clock className="size-4 text-ember" />
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Selected:{" "}
+                  Included with your request:{" "}
                   <span className="text-foreground font-medium">
-                    {days[selectedDay].weekday} {days[selectedDay].day}
+                    {days[selectedDay]!.weekday} {days[selectedDay]!.day}
                   </span>{" "}
-                  ·{" "}
-                  <span className="text-foreground font-medium">
-                    {selectedSlot}
-                  </span>
+                  · <span className="text-foreground font-medium">{selectedSlot}</span>
                 </div>
               </div>
             </div>
@@ -965,19 +1168,14 @@ function Booking() {
                   <div className="size-14 rounded-full bg-ember/15 border border-ember/40 grid place-items-center">
                     <CheckCircle2 className="size-7 text-ember" />
                   </div>
-                  <h3 className="font-display text-2xl font-semibold mt-5">
-                    You're on Alex's calendar.
-                  </h3>
+                  <h3 className="font-display text-2xl font-semibold mt-5">Request received.</h3>
                   <p className="mt-2 text-muted-foreground max-w-sm">
-                    Confirmation sent. Alex will reach out within 24 hours to
-                    lock the time and location.
+                    Alex will confirm by email within 24 hours with availability and next steps. No
+                    automated confirmation has been sent yet.
                   </p>
                 </div>
               ) : (
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-5"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full name</Label>
@@ -985,10 +1183,12 @@ function Booking() {
                         id="name"
                         placeholder="Alex Smith"
                         className="h-11 bg-surface-elevated border-border"
+                        aria-invalid={!!form.formState.errors.name}
+                        aria-describedby={form.formState.errors.name ? "name-error" : undefined}
                         {...form.register("name")}
                       />
                       {form.formState.errors.name && (
-                        <p className="text-xs text-destructive">
+                        <p id="name-error" className="text-xs text-destructive" role="alert">
                           {form.formState.errors.name.message}
                         </p>
                       )}
@@ -1000,10 +1200,12 @@ function Booking() {
                         type="email"
                         placeholder="you@email.com"
                         className="h-11 bg-surface-elevated border-border"
+                        aria-invalid={!!form.formState.errors.email}
+                        aria-describedby={form.formState.errors.email ? "email-error" : undefined}
                         {...form.register("email")}
                       />
                       {form.formState.errors.email && (
-                        <p className="text-xs text-destructive">
+                        <p id="email-error" className="text-xs text-destructive" role="alert">
                           {form.formState.errors.email.message}
                         </p>
                       )}
@@ -1012,50 +1214,84 @@ function Booking() {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Primary goal</Label>
-                      <Select
-                        onValueChange={(v) => form.setValue("goal", v, { shouldValidate: true })}
-                      >
-                        <SelectTrigger className="h-11 bg-surface-elevated border-border">
-                          <SelectValue placeholder="Select your goal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="fat-loss">Fat loss</SelectItem>
-                          <SelectItem value="strength">Strength & muscle</SelectItem>
-                          <SelectItem value="performance">Athletic performance</SelectItem>
-                          <SelectItem value="lifestyle">Lifestyle & health</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {form.formState.errors.goal && (
-                        <p className="text-xs text-destructive">
-                          {form.formState.errors.goal.message}
-                        </p>
-                      )}
+                      <Label htmlFor="goal">Primary goal</Label>
+                      <Controller
+                        name="goal"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <>
+                            <Select
+                              value={field.value || undefined}
+                              onValueChange={(v) => {
+                                field.onChange(v);
+                                form.trigger("goal");
+                              }}
+                            >
+                              <SelectTrigger
+                                id="goal"
+                                className="h-11 bg-surface-elevated border-border"
+                                aria-invalid={fieldState.invalid}
+                                aria-describedby={fieldState.error ? "goal-error" : undefined}
+                              >
+                                <SelectValue placeholder="Select your goal" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="fat-loss">Fat loss</SelectItem>
+                                <SelectItem value="strength">Strength & muscle</SelectItem>
+                                <SelectItem value="performance">Athletic performance</SelectItem>
+                                <SelectItem value="lifestyle">Lifestyle & health</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {fieldState.error && (
+                              <p id="goal-error" className="text-xs text-destructive" role="alert">
+                                {fieldState.error.message}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label>Preferred training type</Label>
-                      <Select
-                        onValueChange={(v) => form.setValue("type", v, { shouldValidate: true })}
-                      >
-                        <SelectTrigger className="h-11 bg-surface-elevated border-border">
-                          <SelectValue placeholder="Select training type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="indoor">Indoor 1-on-1</SelectItem>
-                          <SelectItem value="outdoor">Outdoor strength</SelectItem>
-                          <SelectItem value="group">Small group class</SelectItem>
-                          <SelectItem value="custom">Custom program</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {form.formState.errors.type && (
-                        <p className="text-xs text-destructive">
-                          {form.formState.errors.type.message}
-                        </p>
-                      )}
+                      <Label htmlFor="type">Preferred training type</Label>
+                      <Controller
+                        name="type"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                          <>
+                            <Select
+                              value={field.value || undefined}
+                              onValueChange={(v) => {
+                                field.onChange(v);
+                                form.trigger("type");
+                              }}
+                            >
+                              <SelectTrigger
+                                id="type"
+                                className="h-11 bg-surface-elevated border-border"
+                                aria-invalid={fieldState.invalid}
+                                aria-describedby={fieldState.error ? "type-error" : undefined}
+                              >
+                                <SelectValue placeholder="Select training type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="indoor">Indoor 1-on-1</SelectItem>
+                                <SelectItem value="outdoor">Outdoor strength</SelectItem>
+                                <SelectItem value="group">Small group class</SelectItem>
+                                <SelectItem value="custom">Custom program</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {fieldState.error && (
+                              <p id="type-error" className="text-xs text-destructive" role="alert">
+                                {fieldState.error.message}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div id="booking-consult" className="space-y-2 scroll-mt-24 md:scroll-mt-28">
                     <Label htmlFor="message">Anything Alex should know? (optional)</Label>
                     <Textarea
                       id="message"
@@ -1064,6 +1300,35 @@ function Booking() {
                       className="bg-surface-elevated border-border resize-none"
                       {...form.register("message")}
                     />
+                  </div>
+
+                  <div className="rounded-xl border border-border/80 bg-surface-elevated/50 p-4 space-y-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Your preferred start window (updates when you change the calendar). This is
+                      sent with your request — it does not reserve a slot until Alex confirms.
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="preferredDaySummary">Preferred day</Label>
+                        <Input
+                          id="preferredDaySummary"
+                          readOnly
+                          tabIndex={-1}
+                          className="h-11 bg-background/80 border-border text-foreground cursor-default"
+                          {...form.register("preferredDaySummary")}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="preferredTimeSlot">Preferred time</Label>
+                        <Input
+                          id="preferredTimeSlot"
+                          readOnly
+                          tabIndex={-1}
+                          className="h-11 bg-background/80 border-border text-foreground cursor-default"
+                          {...form.register("preferredTimeSlot")}
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <Button
@@ -1076,7 +1341,7 @@ function Booking() {
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">
-                    Response within 24 hours. Your details stay private.
+                    Alex replies personally within 24 hours. Your details stay private.
                   </p>
                 </form>
               )}
@@ -1090,31 +1355,8 @@ function Booking() {
 
 /* ---------------- FAQ ---------------- */
 function FAQSection() {
-  const faqs = [
-    {
-      q: "Do you train beginners?",
-      a: "Yes — most clients start as beginners or returning to training. Every program is built around your current level with safe, structured progression.",
-    },
-    {
-      q: "Indoor or outdoor sessions?",
-      a: "Both. You can train indoors at a private gym, your building's gym, or outdoors at parks, beaches, and tracks. Choose what fits your week.",
-    },
-    {
-      q: "Which areas in LA do you cover?",
-      a: "West Hollywood, Beverly Hills, Santa Monica, Venice, and Downtown LA. Other locations available on request.",
-    },
-    {
-      q: "Do you offer custom plans?",
-      a: "Yes. Custom 4–12 week programs include programming, weekly check-ins, video feedback, and progression tracking.",
-    },
-    {
-      q: "How fast can I start?",
-      a: "Most clients book their first session within the same week. Reach out and Alex will confirm availability within 24 hours.",
-    },
-  ];
-
   return (
-    <section className="py-24 md:py-32 relative bg-surface/30">
+    <section id="faq" className="py-24 md:py-32 relative bg-surface/30">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <Reveal>
           <div className="text-center mb-14">
@@ -1131,7 +1373,7 @@ function FAQSection() {
             collapsible
             className="rounded-2xl border border-border/60 bg-background overflow-hidden"
           >
-            {faqs.map((f, i) => (
+            {MARKETING_FAQS.map((f, i) => (
               <AccordionItem
                 key={f.q}
                 value={`item-${i}`}
@@ -1162,15 +1404,25 @@ function Footer() {
           <h3 className="font-display text-3xl md:text-5xl font-semibold mt-5 max-w-2xl mx-auto text-balance">
             Your next training block starts this week.
           </h3>
-          <a href="#booking" className="inline-block mt-8">
-            <Button
-              size="lg"
-              className="h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
-            >
+          <Button
+            asChild
+            size="lg"
+            className="mt-8 h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
+          >
+            <a href="#booking">
               Book Your Session
               <ArrowRight className="size-4" />
-            </Button>
-          </a>
+            </a>
+          </Button>
+          <p className="mt-5 text-sm text-muted-foreground">
+            Not ready to book?{" "}
+            <a
+              href="#schedule"
+              className="text-foreground/80 underline underline-offset-4 decoration-border hover:text-ember hover:decoration-ember transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              View schedule
+            </a>
+          </p>
         </div>
 
         <div className="mt-16 grid md:grid-cols-4 gap-10">
@@ -1184,8 +1436,8 @@ function Footer() {
               </span>
             </div>
             <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Premium personal training in Los Angeles. Indoor, outdoor, and
-              custom coaching for expats and busy professionals.
+              Premium personal training in Los Angeles. Indoor, outdoor, and custom coaching for
+              expats and busy professionals.
             </p>
           </div>
 
@@ -1196,7 +1448,10 @@ function Footer() {
             <ul className="space-y-2.5 text-sm">
               {NAV.map((n) => (
                 <li key={n.href}>
-                  <a href={n.href} className="hover:text-ember transition-colors">
+                  <a
+                    href={n.href}
+                    className="hover:text-ember transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
                     {n.label}
                   </a>
                 </li>
@@ -1209,20 +1464,18 @@ function Footer() {
               Contact
             </div>
             <ul className="space-y-3 text-sm">
-              <li>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 hover:text-ember transition-colors"
-                >
-                  <Instagram className="size-4" /> @alex.carter
-                </a>
+              <li className="inline-flex items-start gap-2 text-muted-foreground">
+                <Instagram className="size-4 shrink-0 mt-0.5" aria-hidden />
+                <span>
+                  Find us on Instagram as <span className="text-foreground">@alex.carter</span>
+                  {" — "}
+                  <span className="text-muted-foreground">public profile link coming soon</span>
+                </span>
               </li>
               <li>
                 <a
                   href="mailto:hello@alexcarter.la"
-                  className="inline-flex items-center gap-2 hover:text-ember transition-colors"
+                  className="inline-flex items-center gap-2 rounded-md hover:text-ember transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <Mail className="size-4" />
                   <span>hello@alexcarter.la</span>
