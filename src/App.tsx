@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -58,10 +58,6 @@ import {
 import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({
-  component: LandingPage,
-});
-
 const NAV = [
   { href: "#services", label: "Services" },
   { href: "#schedule", label: "Schedule" },
@@ -71,6 +67,15 @@ const NAV = [
 ];
 
 const MOBILE_NAV_PANEL_ID = "site-mobile-nav-panel";
+
+export default function App() {
+  return (
+    <>
+      <LandingPage />
+      <Toaster theme="dark" position="top-center" richColors />
+    </>
+  );
+}
 
 function LandingPage() {
   return (
