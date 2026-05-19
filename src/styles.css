@@ -158,6 +158,21 @@
     color: transparent;
   }
 
+  .hero-glow-top {
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 70% 55% at 50% 18%,
+      color-mix(in oklab, var(--ember) 22%, transparent),
+      transparent 70%
+    );
+  }
+
+  .hero-coach-ambient {
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 70% 65% at 50% 55%, black 15%, transparent 72%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 55%, black 15%, transparent 72%);
+  }
+
   /* Film grain: low opacity, GPU layer, no pointer hit targets */
   .grain {
     pointer-events: none;

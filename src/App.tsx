@@ -29,7 +29,6 @@ import {
   Zap,
 } from "lucide-react";
 
-import heroImg from "@/assets/hero.jpg";
 import indoorImg from "@/assets/service-indoor.jpg";
 import outdoorImg from "@/assets/service-outdoor.jpg";
 import customImg from "@/assets/service-custom.jpg";
@@ -56,6 +55,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { MARKETING_FAQS } from "@/lib/marketing-faq";
+import { buildLandingJsonLd } from "@/lib/landing-schema";
+import { getSiteOrigin } from "@/lib/site-url";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -63,15 +64,77 @@ const NAV = [
   { href: "#schedule", label: "Schedule" },
   { href: "#why", label: "Why Alex" },
   { href: "#logistics", label: "Logistics" },
+  { href: "#faq", label: "FAQ" },
   { href: "#booking", label: "Book" },
 ];
 
 const MOBILE_NAV_PANEL_ID = "site-mobile-nav-panel";
+const JSON_LD_SCRIPT_ID = "landing-jsonld";
+
+function isHomePath(pathname: string) {
+  return pathname === "/" || pathname === "";
+}
+
+function useLandingJsonLd() {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.id = JSON_LD_SCRIPT_ID;
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(buildLandingJsonLd(getSiteOrigin()));
+    document.head.appendChild(script);
+    return () => script.remove();
+  }, []);
+}
+
+function useIsHomeRoute() {
+  const [isHome, setIsHome] = useState(() =>
+    typeof window === "undefined" ? true : isHomePath(window.location.pathname),
+  );
+
+  useEffect(() => {
+    const sync = () => setIsHome(isHomePath(window.location.pathname));
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, []);
+
+  return isHome;
+}
+
+function NotFoundPage() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
+      <motion.div className="pointer-events-none absolute inset-0 grain opacity-90" aria-hidden />
+      <div className="relative z-10 max-w-md text-center">
+        <p className="font-display text-xs font-medium uppercase tracking-[0.2em] text-ember">
+          Alex Carter
+        </p>
+        <h1 className="font-display text-7xl font-semibold tracking-tight text-ember">404</h1>
+        <h2 className="mt-2 font-display text-xl font-semibold tracking-tight text-foreground">
+          Page not found
+        </h2>
+        <p className="mt-3 text-sm text-pretty text-muted-foreground">
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
+        </p>
+        <div className="mt-8">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-ember px-6 py-2.5 text-sm font-medium text-background shadow-ember transition-colors hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Go home
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
+  const isHome = useIsHomeRoute();
+  useLandingJsonLd();
+
   return (
     <>
-      <LandingPage />
+      {isHome ? <LandingPage /> : <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>
   );
@@ -242,232 +305,119 @@ const HERO_STATS = [
   { k: "1:1", v: "Personalized plans" },
 ] as const;
 
-function HeroShowcase({ reduceMotion }: { reduceMotion: boolean | null }) {
-  const float = (delay = 0) =>
-    reduceMotion
-      ? {}
-      : {
-          animate: { y: [0, -10, 0] },
-          transition: { duration: 5.5, repeat: Infinity, ease: "easeInOut" as const, delay },
-        };
-
-  return (
-    <motion.div
-      {...float(0)}
-      className="relative mx-auto w-full max-w-[28rem] lg:max-w-none"
-    >
-      <motion.div
-        className="pointer-events-none absolute -inset-10 rounded-[2.5rem] bg-gradient-to-br from-ember/30 via-ember/5 to-transparent blur-3xl"
-        aria-hidden
-      />
-      <motion.div
-        className="pointer-events-none absolute right-0 top-1/4 h-56 w-56 rounded-full bg-ember/20 blur-[90px]"
-        aria-hidden
-      />
-
-      <motion.div className="relative overflow-hidden rounded-[1.75rem] border border-border/60 glass-strong shadow-elevated ring-1 ring-white/5">
-        <img
-          src={coachImg}
-          alt="Alex Carter coaching a strength session"
-          width={800}
-          height={1000}
-          loading="eager"
-          className="aspect-[4/5] w-full object-cover object-[center_18%]"
-        />
-        <motion.div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent" />
-        <motion.div className="absolute inset-x-0 bottom-0 border-t border-border/50 bg-background/55 p-4 backdrop-blur-md">
-          <motion.div className="flex items-center justify-between gap-3">
-            <motion.div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                This week
-              </p>
-              <p className="font-display text-sm font-semibold">Strength block · Week 3</p>
-            </motion.div>
-            <motion.div className="inline-flex items-center gap-1.5 rounded-full border border-ember/30 bg-ember/10 px-2.5 py-1 text-xs font-medium text-ember">
-              <LineChart className="size-3.5" aria-hidden />
-              +12% volume
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        {...float(0.4)}
-        className="absolute -left-3 top-10 z-10 max-w-[11.5rem] rounded-2xl border border-border/60 bg-background/90 p-3.5 shadow-lg backdrop-blur-xl sm:-left-6"
-      >
-        <motion.div className="flex items-start gap-2.5">
-          <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-ember/15 text-ember">
-            <CheckCircle2 className="size-4" aria-hidden />
-          </span>
-          <motion.div>
-            <p className="text-xs font-medium text-foreground">Session confirmed</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-              Tue 6:30 PM · Outdoor strength
-            </p>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        {...float(0.8)}
-        className="absolute -right-2 top-[38%] z-10 rounded-2xl border border-border/60 bg-surface/90 px-3.5 py-3 shadow-lg backdrop-blur-xl sm:-right-5"
-      >
-        <motion.div className="flex items-center gap-2">
-          <span className="grid size-8 place-items-center rounded-lg border border-border/60 bg-background">
-            <Timer className="size-4 text-ember" aria-hidden />
-          </span>
-          <motion.div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg session</p>
-            <p className="font-display text-sm font-semibold">60 min</p>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        {...float(1.2)}
-        className="absolute -bottom-4 left-4 right-4 z-10 rounded-2xl border border-border/60 bg-background/90 p-3 shadow-lg backdrop-blur-xl sm:left-8 sm:right-8"
-      >
-        <motion.div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-ember" aria-hidden />
-          <span className="text-foreground/90">Request</span>
-          <ArrowRight className="size-3 opacity-50" aria-hidden />
-          <span className="text-foreground/90">Confirm</span>
-          <ArrowRight className="size-3 opacity-50" aria-hidden />
-          <span>Train</span>
-        </motion.div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
 function Hero() {
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, 90]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0.55]);
-
-  const heroLayers = (
-    <>
-      <img
-        src={heroImg}
-        alt=""
-        width={1920}
-        height={1080}
-        sizes="100vw"
-        decoding="async"
-        fetchPriority="high"
-        className="size-full object-cover object-[center_30%] opacity-55 saturate-[0.85] lg:opacity-45"
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_0%,color-mix(in_oklab,var(--ember)_14%,transparent),transparent_58%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/88 to-background" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/92 to-background/55 lg:via-background/78 lg:to-background/35" />
-      <div className="hero-grid absolute inset-0" aria-hidden />
-      <div className="grain absolute inset-0" aria-hidden />
-    </>
-  );
+  const y = useTransform(scrollY, [0, 600], [0, 60]);
+  const opacity = useTransform(scrollY, [0, 400], [1, 0.6]);
 
   const heroTextProps = reduceMotion
     ? { initial: false as const }
     : {
-        initial: { opacity: 0, y: 28 },
+        initial: { opacity: 0, y: 32 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as const },
+        transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
       };
 
-  const showcaseProps = reduceMotion
-    ? { initial: false as const }
-    : {
-        initial: { opacity: 0, y: 32, scale: 0.98 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const, delay: 0.12 },
-      };
+  const background = (
+    <>
+      <motion.div className="absolute inset-0 bg-background" />
+      <motion.div className="hero-glow-top absolute inset-0" aria-hidden />
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-[54%] h-[min(58vh,540px)] w-[min(72vw,400px)] -translate-x-1/2 -translate-y-1/2"
+        aria-hidden
+      >
+        <img
+          src={coachImg}
+          alt=""
+          width={800}
+          height={1000}
+          decoding="async"
+          fetchPriority="high"
+          className="hero-coach-ambient size-full object-cover object-[center_20%] opacity-[0.28] saturate-[0.9] contrast-[1.05]"
+        />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-full bg-ember/15 blur-[100px]"
+        aria-hidden
+      />
+      <motion.div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
+      <motion.div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_42%,transparent_20%,var(--background)_88%)]" />
+      <motion.div className="hero-grid absolute inset-0" aria-hidden />
+      <motion.div className="grain absolute inset-0" aria-hidden />
+    </>
+  );
 
   return (
     <section
       id="top"
-      className="relative flex min-h-[100svh] items-center overflow-hidden pt-24 pb-20 md:pt-28 md:pb-24 lg:pt-32 lg:pb-28"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 pt-28 pb-16 text-center md:px-8 md:pt-32 md:pb-20"
     >
       {reduceMotion ? (
-        <div className="absolute inset-0 -z-10">{heroLayers}</div>
+        <motion.div className="absolute inset-0 -z-10">{background}</motion.div>
       ) : (
         <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10">
-          {heroLayers}
+          {background}
         </motion.div>
       )}
 
-      <div className="relative mx-auto w-full max-w-[84rem] px-5 md:px-8 lg:px-10">
-        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:gap-10 xl:gap-14 2xl:gap-16">
-          <motion.div
-            {...heroTextProps}
-            className="mx-auto w-full max-w-2xl text-center lg:mx-0 lg:max-w-[38rem] lg:text-left"
+      <motion.div
+        {...heroTextProps}
+        className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center"
+      >
+        <motion.div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-ember/30 bg-surface/50 px-4 py-2 text-xs font-medium tracking-[0.12em] text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
+          <span className="size-1.5 rounded-full bg-ember motion-safe:animate-pulse" />
+          Now coaching in Los Angeles · Limited spots
+        </motion.div>
+
+        <h1 className="font-display text-[clamp(2.85rem,7vw,5.25rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-balance">
+          <span className="block text-foreground">Structured Training.</span>
+          <span className="hero-headline-accent mt-3 block">Real Results.</span>
+        </h1>
+
+        <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg md:leading-[1.75]">
+          Premium indoor &amp; outdoor coaching for expats and busy professionals in Los Angeles.
+          Built around your schedule, your goals, and the way you actually live.
+        </p>
+
+        <motion.div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+          <Button
+            asChild
+            size="lg"
+            className="h-12 rounded-full bg-ember px-8 font-medium text-background shadow-ember hover:bg-ember/90"
           >
-            <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-ember/25 bg-surface/55 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md">
-              <span className="size-1.5 rounded-full bg-ember motion-safe:animate-pulse" />
-              Now coaching in Los Angeles · Limited spots
-            </div>
-
-            <h1 className="font-display text-[clamp(2.65rem,5.4vw,4.85rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-balance">
-              <span className="block text-foreground">Structured Training.</span>
-              <span className="hero-headline-accent mt-2 block">Real Results.</span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground text-pretty md:text-[1.0625rem] md:leading-[1.7] lg:mx-0">
-              Premium indoor &amp; outdoor coaching for expats and busy professionals in Los
-              Angeles. Built around your schedule, your goals, and the way you actually live.
-            </p>
-
-            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 w-full rounded-full bg-ember px-7 font-medium text-background shadow-ember hover:bg-ember/90 sm:w-auto"
-              >
-                <a href="#booking">
-                  Book Your Session
-                  <ArrowRight className="size-4" />
-                </a>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="h-12 w-full rounded-full border-border/70 bg-surface/45 px-7 backdrop-blur hover:bg-surface sm:w-auto"
-              >
-                <a href="#booking-consult">Free Consultation</a>
-              </Button>
-            </div>
-            <p className="mx-auto mt-4 max-w-md text-center text-xs leading-relaxed text-muted-foreground sm:text-sm lg:mx-0 lg:text-left">
-              Request your preferred day and time — Alex confirms personally within 24 hours.
-            </p>
-
-            <div className="mt-12 grid grid-cols-3 gap-3 sm:gap-4">
-              {HERO_STATS.map((s, i) => (
-                <div
-                  key={s.k}
-                  className={cn(
-                    "rounded-2xl border border-border/55 bg-surface/45 px-3 py-4 text-center backdrop-blur-sm lg:text-left",
-                    i === 1 && "lg:translate-y-2",
-                  )}
-                >
-                  <div className="font-display text-xl font-semibold tracking-tight sm:text-2xl md:text-[1.65rem]">
-                    {s.k}
-                  </div>
-                  <div className="mt-1 text-[10px] leading-snug text-muted-foreground sm:text-xs">
-                    {s.v}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            {...showcaseProps}
-            className="hidden md:block lg:justify-self-end lg:pl-4 xl:pl-8"
+            <a href="#booking">
+              Book Your Session
+              <ArrowRight className="size-4" />
+            </a>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 rounded-full border-border/70 bg-surface/50 px-8 backdrop-blur hover:bg-surface"
           >
-            <HeroShowcase reduceMotion={reduceMotion} />
-          </motion.div>
-        </div>
-      </div>
+            <a href="#booking-consult">Free Consultation</a>
+          </Button>
+        </motion.div>
+
+        <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground sm:text-sm">
+          Request your preferred day and time — Alex confirms personally within 24 hours.
+        </p>
+
+        <motion.div className="mt-12 flex w-full max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-border/50 pt-10">
+          {HERO_STATS.map((s) => (
+            <motion.div key={s.k} className="min-w-[5.5rem] text-center">
+              <motion.div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+                {s.k}
+              </motion.div>
+              <motion.div className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">
+                {s.v}
+              </motion.div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
@@ -983,69 +933,55 @@ function Trust() {
   ];
 
   return (
-    <section className="py-24 md:py-32 relative">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <Reveal>
-            <div className="relative rounded-3xl overflow-hidden border border-border/60 ember-glow">
-              <img
-                src={coachImg}
-                alt="Alex Carter, certified personal trainer"
-                width={1024}
-                height={1280}
-                loading="lazy"
-                className="size-full object-cover aspect-[4/5]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 glass-strong rounded-2xl border border-border/60 p-5">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-ember/20 border border-ember/40 grid place-items-center">
-                    <ShieldCheck className="size-5 text-ember" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">Alex Carter</div>
-                    <div className="text-xs text-muted-foreground">
-                      Certified Personal Trainer · Los Angeles
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.1}>
+    <section className="relative py-24 md:py-32">
+      <div className="mx-auto max-w-3xl px-5 md:px-8">
+        <Reveal>
+          <div className="text-center">
             <Eyebrow>Why you can trust the work</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
+            <h2 className="font-display mt-4 text-4xl font-semibold text-balance md:text-5xl">
               A coach built around clarity, safety, and real progress.
             </h2>
-            <p className="mt-5 text-muted-foreground leading-relaxed max-w-lg">
+            <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted-foreground">
               No fads. No gimmicks. Just professional, structured coaching tailored to your level —
               designed to deliver progress you can feel and measure.
             </p>
+            <motion.div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-2xl border border-border/60 bg-surface/60 px-5 py-4 backdrop-blur-sm">
+              <div className="grid size-10 place-items-center rounded-full border border-ember/40 bg-ember/15">
+                <ShieldCheck className="size-5 text-ember" />
+              </motion.div>
+              <motion.div className="text-left">
+                <div className="text-sm font-medium">Alex Carter</div>
+                <div className="text-xs text-muted-foreground">
+                  Certified Personal Trainer · Los Angeles
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </Reveal>
 
-            <ul className="mt-8 grid sm:grid-cols-2 gap-3">
-              {points.map((p) => (
-                <li key={p} className="flex items-start gap-3 text-sm">
-                  <CheckCircle2 className="size-5 text-ember mt-0.5 shrink-0" />
-                  <span>{p}</span>
-                </li>
-              ))}
-            </ul>
+        <Reveal delay={0.08}>
+          <ul className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
+            {points.map((p) => (
+              <li key={p} className="flex items-start gap-3 text-sm">
+                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-ember" />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
 
-            <div className="mt-10 flex flex-wrap gap-2">
-              {badges.map((b) => (
-                <div
-                  key={b.label}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-xs"
-                >
-                  <b.icon className="size-3.5 text-ember" />
-                  {b.label}
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </div>
+          <motion.div className="mt-10 flex flex-wrap justify-center gap-2">
+            {badges.map((b) => (
+              <div
+                key={b.label}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-xs"
+              >
+                <b.icon className="size-3.5 text-ember" />
+                {b.label}
+              </motion.div>
+            ))}
+          </motion.div>
+        </Reveal>
+      </motion.div>
     </section>
   );
 }
