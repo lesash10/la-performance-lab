@@ -131,6 +131,33 @@
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
+  .hero-grid {
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+  }
+  .hero-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--border) 35%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--border) 35%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: 0.35;
+  }
+
+  .hero-headline-accent {
+    background: linear-gradient(
+      105deg,
+      var(--ember) 0%,
+      var(--ember-glow) 42%,
+      color-mix(in oklab, var(--foreground) 88%, var(--ember-glow)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Film grain: low opacity, GPU layer, no pointer hit targets */
   .grain {
     pointer-events: none;
