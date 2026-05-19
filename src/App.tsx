@@ -354,7 +354,7 @@ function Hero() {
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 pt-28 pb-16 text-center md:px-8 md:pt-32 md:pb-20"
     >
       {reduceMotion ? (
-        <motion.div className="absolute inset-0 -z-10">{background}</motion.div>
+        <div className="absolute inset-0 -z-10">{background}</div>
       ) : (
         <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10">
           {background}
@@ -365,10 +365,10 @@ function Hero() {
         {...heroTextProps}
         className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center"
       >
-        <motion.div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-ember/30 bg-surface/50 px-4 py-2 text-xs font-medium tracking-[0.12em] text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
+        <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-ember/30 bg-surface/50 px-4 py-2 text-xs font-medium tracking-[0.12em] text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
           <span className="size-1.5 rounded-full bg-ember motion-safe:animate-pulse" />
           Now coaching in Los Angeles · Limited spots
-        </motion.div>
+        </div>
 
         <h1 className="font-display text-[clamp(2.85rem,7vw,5.25rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-balance">
           <span className="block text-foreground">Structured Training.</span>
@@ -380,7 +380,7 @@ function Hero() {
           Built around your schedule, your goals, and the way you actually live.
         </p>
 
-        <motion.div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+        <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
           <Button
             asChild
             size="lg"
@@ -399,24 +399,24 @@ function Hero() {
           >
             <a href="#booking-consult">Free Consultation</a>
           </Button>
-        </motion.div>
+        </div>
 
         <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground sm:text-sm">
           Request your preferred day and time — Alex confirms personally within 24 hours.
         </p>
 
-        <motion.div className="mt-12 flex w-full max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-border/50 pt-10">
+        <div className="mt-12 flex w-full max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-border/50 pt-10">
           {HERO_STATS.map((s) => (
-            <motion.div key={s.k} className="min-w-[5.5rem] text-center">
-              <motion.div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+            <div key={s.k} className="min-w-[5.5rem] text-center">
+              <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                 {s.k}
-              </motion.div>
-              <motion.div className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">
+              </div>
+              <div className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">
                 {s.v}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </motion.div>
     </section>
   );
@@ -945,18 +945,18 @@ function Trust() {
               No fads. No gimmicks. Just professional, structured coaching tailored to your level —
               designed to deliver progress you can feel and measure.
             </p>
-            <motion.div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-2xl border border-border/60 bg-surface/60 px-5 py-4 backdrop-blur-sm">
+            <div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-2xl border border-border/60 bg-surface/60 px-5 py-4 backdrop-blur-sm">
               <div className="grid size-10 place-items-center rounded-full border border-ember/40 bg-ember/15">
                 <ShieldCheck className="size-5 text-ember" />
-              </motion.div>
-              <motion.div className="text-left">
+              </div>
+              <div className="text-left">
                 <div className="text-sm font-medium">Alex Carter</div>
                 <div className="text-xs text-muted-foreground">
                   Certified Personal Trainer · Los Angeles
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+                </div>
+              </div>
+            </div>
+          </div>
         </Reveal>
 
         <Reveal delay={0.08}>
@@ -969,7 +969,7 @@ function Trust() {
             ))}
           </ul>
 
-          <motion.div className="mt-10 flex flex-wrap justify-center gap-2">
+          <div className="mt-10 flex flex-wrap justify-center gap-2">
             {badges.map((b) => (
               <div
                 key={b.label}
@@ -977,11 +977,11 @@ function Trust() {
               >
                 <b.icon className="size-3.5 text-ember" />
                 {b.label}
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </Reveal>
-      </motion.div>
+      </div>
     </section>
   );
 }
