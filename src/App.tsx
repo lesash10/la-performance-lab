@@ -19,7 +19,6 @@ import {
   MapPin,
   Menu,
   Mountain,
-  Quote,
   ShieldCheck,
   Sparkles,
   Target,
@@ -70,6 +69,10 @@ const NAV = [
 
 const MOBILE_NAV_PANEL_ID = "site-mobile-nav-panel";
 const JSON_LD_SCRIPT_ID = "landing-jsonld";
+const PRIMARY_CTA_CLASS =
+  "rounded-lg bg-ember px-7 font-semibold tracking-[0.01em] text-background shadow-ember hover:-translate-y-0.5 hover:bg-ember/90";
+const SECONDARY_CTA_CLASS =
+  "rounded-lg border-border/70 bg-surface/50 px-7 font-semibold tracking-[0.01em] backdrop-blur hover:-translate-y-0.5 hover:border-ember/50 hover:bg-surface-elevated hover:text-foreground";
 
 function isHomePath(pathname: string) {
   return pathname === "/" || pathname === "";
@@ -118,7 +121,7 @@ function NotFoundPage() {
         <div className="mt-8">
           <a
             href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-ember px-6 py-2.5 text-sm font-medium text-background shadow-ember transition-colors hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-ember px-6 py-2.5 text-sm font-semibold tracking-[0.01em] text-background shadow-ember transition-all hover:-translate-y-0.5 hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Go home
           </a>
@@ -232,7 +235,7 @@ function Nav() {
             <a
               key={n.href}
               href={n.href}
-              className="rounded-full px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="rounded-md px-3.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface/80 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {n.label}
             </a>
@@ -240,10 +243,7 @@ function Nav() {
         </nav>
 
         <motion.div className="ml-auto hidden items-center gap-3 md:flex">
-          <Button
-            asChild
-            className="h-10 rounded-full bg-ember px-5 font-medium text-background shadow-ember hover:bg-ember/90"
-          >
+          <Button asChild className={cn("h-10 px-5", PRIMARY_CTA_CLASS)}>
             <a href="#booking">
               Book Session
               <ArrowRight className="size-4" />
@@ -283,10 +283,7 @@ function Nav() {
                 {n.label}
               </a>
             ))}
-            <Button
-              asChild
-              className="w-full bg-ember hover:bg-ember/90 text-background rounded-full"
-            >
+            <Button asChild className={cn("w-full", PRIMARY_CTA_CLASS)}>
               <a href="#booking" onClick={() => setOpen(false)}>
                 Book Session
               </a>
@@ -365,38 +362,24 @@ function Hero() {
         {...heroTextProps}
         className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center"
       >
-        <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-ember/30 bg-surface/50 px-4 py-2 text-xs font-medium tracking-[0.12em] text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md">
-          <span className="size-1.5 rounded-full bg-ember motion-safe:animate-pulse" />
-          Now coaching in Los Angeles · Limited spots
-        </div>
-
         <h1 className="font-display text-[clamp(2.85rem,7vw,5.25rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-balance">
           <span className="block text-foreground">Structured Training.</span>
           <span className="hero-headline-accent mt-3 block">Real Results.</span>
         </h1>
 
         <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg md:leading-[1.75]">
-          Premium indoor &amp; outdoor coaching for expats and busy professionals in Los Angeles.
+          Private indoor and outdoor coaching for expats and busy professionals in Los Angeles.
           Built around your schedule, your goals, and the way you actually live.
         </p>
 
         <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
-          <Button
-            asChild
-            size="lg"
-            className="h-12 rounded-full bg-ember px-8 font-medium text-background shadow-ember hover:bg-ember/90"
-          >
+          <Button asChild size="lg" className={cn("h-12", PRIMARY_CTA_CLASS)}>
             <a href="#booking">
               Book Your Session
               <ArrowRight className="size-4" />
             </a>
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="h-12 rounded-full border-border/70 bg-surface/50 px-8 backdrop-blur hover:bg-surface"
-          >
+          <Button asChild size="lg" variant="outline" className={cn("h-12", SECONDARY_CTA_CLASS)}>
             <a href="#booking-consult">Free Consultation</a>
           </Button>
         </div>
@@ -485,7 +468,7 @@ function StickyMobileBookingCta() {
       <div className="mx-auto max-w-lg flex items-stretch gap-2 rounded-2xl border border-border/70 bg-background/95 backdrop-blur-xl shadow-lg shadow-black/20 p-2 pl-3">
         <a
           href="#booking"
-          className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-ember px-4 py-3 text-sm font-medium text-background shadow-ember focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-ember px-4 py-3 text-sm font-semibold tracking-[0.01em] text-background shadow-ember transition-all hover:-translate-y-0.5 hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Book session
           <ArrowRight className="size-4 shrink-0" aria-hidden />
@@ -493,7 +476,7 @@ function StickyMobileBookingCta() {
         <button
           type="button"
           onClick={dismiss}
-          className="shrink-0 grid place-items-center size-11 rounded-xl border border-border/60 text-muted-foreground hover:text-foreground hover:bg-surface transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="shrink-0 grid place-items-center size-11 rounded-lg border border-border/60 text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label="Dismiss booking shortcut"
         >
           <X className="size-5" aria-hidden />
@@ -530,15 +513,6 @@ function Reveal({
   );
 }
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-2 text-xs font-medium tracking-[0.2em] uppercase text-ember">
-      <span className="h-px w-6 bg-ember/60" />
-      {children}
-    </div>
-  );
-}
-
 /* ---------------- Social Proof ---------------- */
 function SocialProof() {
   const testimonials = [
@@ -569,8 +543,7 @@ function SocialProof() {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
             <div>
-              <Eyebrow>Trusted globally</Eyebrow>
-              <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 max-w-xl text-balance">
+              <h2 className="font-display text-4xl md:text-5xl font-semibold max-w-xl text-balance">
                 Coaching that delivers, season after season.
               </h2>
             </div>
@@ -597,36 +570,43 @@ function SocialProof() {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
-          {testimonials.map((t, i) => (
-            <Reveal key={t.name} delay={i * 0.08}>
-              <div className="group glass rounded-2xl border border-border/60 overflow-hidden h-full hover:border-ember/40 transition-colors">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={t.img}
-                    alt={t.name}
-                    width={800}
-                    height={600}
-                    loading="lazy"
-                    className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                </div>
-                <div className="p-6">
-                  <Quote className="size-5 text-ember mb-3" />
-                  <p className="text-sm leading-relaxed text-foreground/90">{t.quote}</p>
-                  <div className="mt-5 pt-5 border-t border-border/60 flex items-center justify-between">
+        <Reveal>
+          <div className="overflow-hidden rounded-2xl border border-border/70 bg-background md:grid md:grid-cols-3 md:divide-x md:divide-border/70 max-md:divide-y max-md:divide-border/70">
+            {testimonials.map((t) => (
+              <article
+                key={t.name}
+                className="group relative min-h-[28rem] overflow-hidden md:min-h-[32rem]"
+              >
+                <img
+                  src={t.img}
+                  alt={t.name}
+                  width={900}
+                  height={1100}
+                  loading="lazy"
+                  className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/92 via-background/45 to-background/10" />
+                <div className="absolute inset-x-0 bottom-0 p-7 md:p-8">
+                  <p className="max-w-sm font-display text-2xl font-semibold leading-tight tracking-tight text-foreground text-balance">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/18 pt-5">
                     <div>
-                      <div className="text-sm font-medium">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.role}</div>
+                      <div className="text-sm font-semibold">{t.name}</div>
+                      <div className="mt-1 text-xs text-foreground/70">{t.role}</div>
                     </div>
-                    <div className="text-ember text-sm">★★★★★</div>
+                    <div
+                      className="text-sm tracking-[0.18em] text-ember"
+                      aria-label="5 star rating"
+                    >
+                      ★★★★★
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -639,7 +619,7 @@ function Services() {
       img: indoorImg,
       icon: Dumbbell,
       title: "Indoor Personal Training",
-      desc: "Private 1-on-1 strength sessions inside premium LA gyms or your building.",
+      desc: "Private 1-on-1 strength sessions inside well-equipped LA gyms or your building.",
       benefits: ["Strength & hypertrophy", "Fat loss programming", "Form-perfect coaching"],
     },
     {
@@ -664,8 +644,7 @@ function Services() {
       <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="max-w-2xl mb-14">
-            <Eyebrow>Services</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
               Three ways to train. One standard of work.
             </h2>
           </div>
@@ -703,7 +682,7 @@ function Services() {
                   <Button
                     asChild
                     variant="outline"
-                    className="mt-7 w-full rounded-full border-border/80 bg-transparent hover:bg-ember hover:text-background hover:border-ember transition-colors"
+                    className="mt-7 w-full border-border/80 bg-transparent hover:border-ember hover:bg-ember hover:text-background"
                   >
                     <a href="#booking">
                       Book this session
@@ -759,10 +738,13 @@ function WhyAlex() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="max-w-2xl mb-14">
-            <Eyebrow>Why train with Alex</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
-              Premium coaching, engineered for the way you live.
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
+              What&apos;s it like training with Alex?
             </h2>
+            <p className="mt-5 max-w-xl text-muted-foreground">
+              Clear sessions, honest feedback, and a plan that fits your week. You will know what
+              you are doing, why it matters, and how progress is being measured.
+            </p>
           </div>
         </Reveal>
 
@@ -836,8 +818,7 @@ function Schedule() {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
             <div>
-              <Eyebrow>Schedule</Eyebrow>
-              <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 max-w-xl text-balance">
+              <h2 className="font-display text-4xl md:text-5xl font-semibold max-w-xl text-balance">
                 Session types and example time windows.
               </h2>
             </div>
@@ -872,10 +853,10 @@ function Schedule() {
                 <p className="mt-5 text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
 
                 <div className="mt-5 flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-full bg-surface border border-border px-3 py-1 text-muted-foreground">
+                  <span className="rounded-md bg-surface border border-border px-3 py-1 text-muted-foreground">
                     Intensity · {c.intensity}
                   </span>
-                  <span className="rounded-full bg-surface border border-border px-3 py-1 text-muted-foreground">
+                  <span className="rounded-md bg-surface border border-border px-3 py-1 text-muted-foreground">
                     {c.duration}
                   </span>
                 </div>
@@ -896,10 +877,7 @@ function Schedule() {
                   </div>
                 </div>
 
-                <Button
-                  asChild
-                  className="mt-7 w-full rounded-full bg-ember hover:bg-ember/90 text-background h-11 shadow-ember"
-                >
+                <Button asChild className={cn("mt-7 h-11 w-full", PRIMARY_CTA_CLASS)}>
                   <a href="#booking">
                     Book This Session
                     <ArrowRight className="size-4" />
@@ -917,66 +895,66 @@ function Schedule() {
 /* ---------------- Trust ---------------- */
 function Trust() {
   const points = [
-    "Certified personal trainer",
-    "Experience coaching expats & busy professionals",
-    "Personalized programs for your goals",
-    "Safe, structured progression system",
-    "Clear, direct communication",
-    "Client-first coaching ethic",
-  ];
-  const badges = [
-    { icon: Target, label: "Structured Programs" },
-    { icon: MapPin, label: "Flexible Locations" },
-    { icon: ShieldCheck, label: "Beginner Friendly" },
-    { icon: Flame, label: "Results Focused" },
-    { icon: Clock, label: "24h Response" },
+    {
+      icon: ShieldCheck,
+      title: "Certified, structured coaching",
+      body: "Training is planned around your level, injury history, and measurable progression.",
+    },
+    {
+      icon: Users,
+      title: "Built for busy clients",
+      body: "Alex coaches expats, founders, and professionals who need training to fit real weeks.",
+    },
+    {
+      icon: Clock,
+      title: "Clear communication",
+      body: "You get direct feedback, simple next steps, and a personal response within 24 hours.",
+    },
   ];
 
   return (
     <section className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-3xl px-5 md:px-8">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <div className="text-center">
-            <Eyebrow>Why you can trust the work</Eyebrow>
-            <h2 className="font-display mt-4 text-4xl font-semibold text-balance md:text-5xl">
-              A coach built around clarity, safety, and real progress.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted-foreground">
-              No fads. No gimmicks. Just professional, structured coaching tailored to your level —
-              designed to deliver progress you can feel and measure.
-            </p>
-            <div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-2xl border border-border/60 bg-surface/60 px-5 py-4 backdrop-blur-sm">
-              <div className="grid size-10 place-items-center rounded-full border border-ember/40 bg-ember/15">
-                <ShieldCheck className="size-5 text-ember" />
-              </div>
-              <div className="text-left">
-                <div className="text-sm font-medium">Alex Carter</div>
-                <div className="text-xs text-muted-foreground">
-                  Certified Personal Trainer · Los Angeles
+          <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr] md:items-end">
+            <div>
+              <h2 className="font-display text-4xl font-semibold text-balance md:text-5xl">
+                Why trust Alex?
+              </h2>
+              <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
+                The work is simple on purpose: train consistently, move well, recover enough, and
+                keep your numbers honest. Alex brings the structure so you can focus on showing up.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-surface/50 p-6 md:p-7">
+              <div className="flex items-center gap-4">
+                <div className="grid size-12 place-items-center rounded-lg border border-ember/40 bg-ember/15">
+                  <ShieldCheck className="size-6 text-ember" />
                 </div>
+                <div>
+                  <div className="text-sm font-semibold">Alex Carter</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Certified Personal Trainer · Los Angeles
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 border-t border-border/60 pt-5 text-sm leading-relaxed text-muted-foreground">
+                Indoor, outdoor, and custom programs with direct accountability and a clear training
+                plan before every block begins.
               </div>
             </div>
           </div>
         </Reveal>
 
         <Reveal delay={0.08}>
-          <ul className="mx-auto mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 md:grid-cols-3">
             {points.map((p) => (
-              <li key={p} className="flex items-start gap-3 text-sm">
-                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-ember" />
-                <span>{p}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-10 flex flex-wrap justify-center gap-2">
-            {badges.map((b) => (
-              <div
-                key={b.label}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-xs"
-              >
-                <b.icon className="size-3.5 text-ember" />
-                {b.label}
+              <div key={p.title} className="bg-background p-7 md:p-8">
+                <div className="grid size-10 place-items-center rounded-lg bg-ember/10">
+                  <p.icon className="size-5 text-ember" />
+                </div>
+                <h3 className="mt-5 font-display text-xl font-semibold">{p.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
               </div>
             ))}
           </div>
@@ -1026,8 +1004,7 @@ function Logistics() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="max-w-2xl mb-14">
-            <Eyebrow>Logistics</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
               Everything practical, before you book.
             </h2>
           </div>
@@ -1049,11 +1026,7 @@ function Logistics() {
 
         <Reveal>
           <div className="mt-12 text-center">
-            <Button
-              asChild
-              size="lg"
-              className="h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
-            >
+            <Button asChild size="lg" className={cn("h-12", PRIMARY_CTA_CLASS)}>
               <a href="#booking">
                 Book Your First Session
                 <ArrowRight className="size-4" />
@@ -1150,8 +1123,7 @@ function Booking() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <div className="max-w-2xl mb-14">
-            <Eyebrow>Book your session</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
               Send a request with your goals and preferred times.
             </h2>
             <p className="mt-5 text-muted-foreground">
@@ -1185,10 +1157,10 @@ function Booking() {
                     type="button"
                     onClick={() => setSelectedDay(d.i)}
                     className={cn(
-                      "rounded-xl py-3 flex flex-col items-center border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                      "rounded-lg py-3 flex flex-col items-center border font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       selectedDay === d.i
                         ? "bg-ember border-ember text-background shadow-ember"
-                        : "bg-surface-elevated border-border hover:border-ember/40",
+                        : "bg-surface-elevated border-border hover:-translate-y-0.5 hover:border-ember/40",
                     )}
                   >
                     <span className="text-[10px] uppercase tracking-wider opacity-80">
@@ -1210,10 +1182,10 @@ function Booking() {
                       type="button"
                       onClick={() => setSelectedSlot(s)}
                       className={cn(
-                        "rounded-lg py-2.5 text-sm font-medium border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        "rounded-lg py-2.5 text-sm font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         selectedSlot === s
                           ? "bg-ember/15 border-ember text-ember"
-                          : "bg-surface-elevated border-border hover:border-ember/40",
+                          : "bg-surface-elevated border-border hover:-translate-y-0.5 hover:border-ember/40",
                       )}
                     >
                       {s}
@@ -1408,11 +1380,7 @@ function Booking() {
                     </div>
                   </div>
 
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full h-12 rounded-full bg-ember hover:bg-ember/90 text-background font-medium shadow-ember"
-                  >
+                  <Button type="submit" size="lg" className={cn("h-12 w-full", PRIMARY_CTA_CLASS)}>
                     Request My Session
                     <ArrowRight className="size-4" />
                   </Button>
@@ -1437,8 +1405,7 @@ function FAQSection() {
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <Reveal>
           <div className="text-center mb-14">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 className="font-display text-4xl md:text-5xl font-semibold mt-4 text-balance">
+            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
               Quick answers.
             </h2>
           </div>
@@ -1477,15 +1444,10 @@ function Footer() {
     <footer className="relative border-t border-border/60 pt-20 pb-10">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <div className="rounded-3xl border border-ember/40 bg-gradient-to-br from-surface to-background p-8 md:p-14 text-center ember-glow">
-          <Eyebrow>Ready when you are</Eyebrow>
-          <h3 className="font-display text-3xl md:text-5xl font-semibold mt-5 max-w-2xl mx-auto text-balance">
+          <h3 className="font-display text-3xl md:text-5xl font-semibold max-w-2xl mx-auto text-balance">
             Your next training block starts this week.
           </h3>
-          <Button
-            asChild
-            size="lg"
-            className="mt-8 h-12 rounded-full bg-ember hover:bg-ember/90 text-background px-8 shadow-ember"
-          >
+          <Button asChild size="lg" className={cn("mt-8 h-12", PRIMARY_CTA_CLASS)}>
             <a href="#booking">
               Book Your Session
               <ArrowRight className="size-4" />
@@ -1513,8 +1475,8 @@ function Footer() {
               </span>
             </div>
             <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Premium personal training in Los Angeles. Indoor, outdoor, and custom coaching for
-              expats and busy professionals.
+              Personal training in Los Angeles. Indoor, outdoor, and custom coaching for expats and
+              busy professionals.
             </p>
           </div>
 
@@ -1568,7 +1530,7 @@ function Footer() {
 
         <div className="mt-14 pt-6 border-t border-border/60 flex flex-col md:flex-row gap-3 justify-between text-xs text-muted-foreground">
           <div>© {new Date().getFullYear()} Alex Carter. All rights reserved.</div>
-          <div>Premium personal training · Los Angeles</div>
+          <div>Personal training · Los Angeles</div>
         </div>
       </div>
     </footer>
