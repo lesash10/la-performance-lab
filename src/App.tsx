@@ -149,7 +149,7 @@ function LandingPage() {
     <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <a
         href="#top"
-        className="absolute left-1/2 top-0 z-[100] -translate-x-1/2 -translate-y-full rounded-md bg-background px-4 py-2.5 text-sm font-medium text-foreground shadow-lg ring-2 ring-ring transition-transform duration-200 focus:translate-y-4 focus:outline-none motion-reduce:transition-none"
+        className="absolute -top-14 left-1/2 z-[100] -translate-x-1/2 rounded-md bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 focus:top-0 focus:translate-y-4 focus:outline-none focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
       >
         Skip to main content
       </a>
