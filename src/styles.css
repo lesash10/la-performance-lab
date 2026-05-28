@@ -161,10 +161,12 @@
   .hero-glow-top {
     pointer-events: none;
     background: radial-gradient(
-      ellipse 70% 55% at 50% 18%,
-      color-mix(in oklab, var(--ember) 22%, transparent),
+      ellipse 70% 55% at 50% 28%,
+      color-mix(in oklab, var(--ember) 18%, transparent),
       transparent 70%
     );
+    mask-image: linear-gradient(to bottom, transparent 0, transparent 4rem, black 9rem);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 4rem, black 9rem);
   }
 
   .hero-coach-ambient {

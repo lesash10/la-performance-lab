@@ -31,6 +31,7 @@ import {
 import indoorImg from "@/assets/service-indoor.jpg";
 import outdoorImg from "@/assets/service-outdoor.jpg";
 import customImg from "@/assets/service-custom.jpg";
+import heroImg from "@/assets/hero.jpg";
 import coachImg from "@/assets/trust-coach.jpg";
 import t1 from "@/assets/transformation-1.jpg";
 import t2 from "@/assets/transformation-2.jpg";
@@ -553,23 +554,6 @@ function SocialProof() {
           </div>
         </Reveal>
 
-        <div className="grid sm:grid-cols-3 gap-4 mb-12">
-          {[
-            { k: "100+", v: "Sessions delivered" },
-            { k: "12+", v: "Nationalities coached" },
-            { k: "4.9★", v: "Average client rating" },
-          ].map((s, i) => (
-            <Reveal key={s.k} delay={i * 0.05}>
-              <div className="glass rounded-2xl border border-border/60 p-7">
-                <div className="font-display text-4xl md:text-5xl font-semibold tracking-tight">
-                  {s.k}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">{s.v}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
         <Reveal>
           <div className="overflow-hidden rounded-2xl border border-border/70 bg-background md:grid md:grid-cols-3 md:divide-x md:divide-border/70 max-md:divide-y max-md:divide-border/70">
             {testimonials.map((t) => (
@@ -706,31 +690,37 @@ function WhyAlex() {
       icon: Target,
       title: "Structured approach",
       desc: "Every session and week tied to a measurable goal.",
+      img: coachImg,
     },
     {
       icon: Timer,
       title: "Efficient sessions",
       desc: "45–75 min training designed around your calendar.",
+      img: heroImg,
     },
     {
       icon: ShieldCheck,
       title: "Real accountability",
       desc: "Weekly check-ins. No drift. No excuses.",
+      img: undefined,
     },
     {
       icon: MapPin,
       title: "Flexible locations",
       desc: "Indoor, outdoor, your gym — wherever you train best.",
+      img: outdoorImg,
     },
     {
       icon: Globe2,
       title: "Built for expats",
       desc: "International communication, no local-jargon coaching.",
+      img: undefined,
     },
     {
       icon: LineChart,
       title: "Progression tracking",
       desc: "Numbers, photos, and lifts — measured every block.",
+      img: customImg,
     },
   ];
   return (
@@ -751,12 +741,27 @@ function WhyAlex() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 rounded-3xl overflow-hidden border border-border/60">
           {items.map((it, i) => (
             <Reveal key={it.title} delay={i * 0.04}>
-              <div className="group bg-background hover:bg-surface transition-colors p-8 h-full">
-                <div className="size-11 rounded-xl bg-surface border border-border grid place-items-center group-hover:bg-ember/10 group-hover:border-ember/40 transition-colors">
-                  <it.icon className="size-5 text-ember" />
+              <div className="group relative overflow-hidden bg-background p-8 h-full transition-colors hover:bg-surface">
+                {it.img && (
+                  <>
+                    <img
+                      src={it.img}
+                      alt=""
+                      width={900}
+                      height={700}
+                      loading="lazy"
+                      className="absolute inset-0 size-full object-cover opacity-[0.16] grayscale transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.22] group-hover:grayscale-0"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-background via-background/88 to-background/55" />
+                  </>
+                )}
+                <div className="relative z-10">
+                  <div className="size-11 rounded-xl bg-surface border border-border grid place-items-center group-hover:bg-ember/10 group-hover:border-ember/40 transition-colors">
+                    <it.icon className="size-5 text-ember" />
+                  </div>
+                  <h3 className="font-display text-xl font-semibold mt-5">{it.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{it.desc}</p>
                 </div>
-                <h3 className="font-display text-xl font-semibold mt-5">{it.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{it.desc}</p>
               </div>
             </Reveal>
           ))}
@@ -770,6 +775,7 @@ function WhyAlex() {
 function Schedule() {
   const classes = [
     {
+      img: indoorImg,
       icon: Dumbbell,
       title: "1-on-1 Indoor Session",
       desc: "Private strength & physique work, programmed week to week.",
@@ -780,6 +786,7 @@ function Schedule() {
       slots: ["7:00 AM", "12:30 PM", "6:30 PM"],
     },
     {
+      img: outdoorImg,
       icon: Mountain,
       title: "Outdoor Strength Session",
       desc: "Sled, kettlebells, sprints — built for athleticism and conditioning.",
@@ -790,6 +797,7 @@ function Schedule() {
       slots: ["6:30 AM", "5:30 PM", "7:00 PM"],
     },
     {
+      img: t2,
       icon: Users,
       title: "Small Group Class",
       desc: "Train with 2–4 people at a similar level. Same coaching, lower price.",
@@ -800,6 +808,7 @@ function Schedule() {
       slots: ["7:30 AM", "8:30 AM", "5:30 PM"],
     },
     {
+      img: customImg,
       icon: Zap,
       title: "Mobility & Conditioning",
       desc: "Recovery, mobility, and metabolic work to keep your body resilient.",
@@ -831,8 +840,17 @@ function Schedule() {
         <div className="grid md:grid-cols-2 gap-5">
           {classes.map((c, i) => (
             <Reveal key={c.title} delay={i * 0.05}>
-              <div className="group rounded-3xl border border-border/60 bg-background hover:border-ember/40 hover:shadow-ember p-7 md:p-8 h-full transition-all">
-                <div className="flex items-start justify-between gap-4">
+              <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-background hover:border-ember/40 hover:shadow-ember p-7 md:p-8 h-full transition-all">
+                <img
+                  src={c.img}
+                  alt=""
+                  width={900}
+                  height={700}
+                  loading="lazy"
+                  className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-1/2 object-cover opacity-[0.14] saturate-[0.85] transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.2] sm:block"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/92 to-background/35" />
+                <div className="relative z-10 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="size-12 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
                       <c.icon className="size-5 text-ember" />
@@ -850,18 +868,17 @@ function Schedule() {
                   </div>
                 </div>
 
-                <p className="mt-5 text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
+                <p className="relative z-10 mt-5 text-sm text-muted-foreground leading-relaxed">
+                  {c.desc}
+                </p>
 
-                <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                <div className="relative z-10 mt-5 flex flex-wrap gap-2 text-xs">
                   <span className="rounded-md bg-surface border border-border px-3 py-1 text-muted-foreground">
                     Intensity · {c.intensity}
                   </span>
-                  <span className="rounded-md bg-surface border border-border px-3 py-1 text-muted-foreground">
-                    {c.duration}
-                  </span>
                 </div>
 
-                <div className="mt-6">
+                <div className="relative z-10 mt-6">
                   <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
                     Example time windows
                   </div>
@@ -877,7 +894,7 @@ function Schedule() {
                   </div>
                 </div>
 
-                <Button asChild className={cn("mt-7 h-11 w-full", PRIMARY_CTA_CLASS)}>
+                <Button asChild className={cn("relative z-10 mt-7 h-11 w-full", PRIMARY_CTA_CLASS)}>
                   <a href="#booking">
                     Book This Session
                     <ArrowRight className="size-4" />
@@ -926,8 +943,17 @@ function Trust() {
                 keep your numbers honest. Alex brings the structure so you can focus on showing up.
               </p>
             </div>
-            <div className="rounded-2xl border border-border/70 bg-surface/50 p-6 md:p-7">
-              <div className="flex items-center gap-4">
+            <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-surface/50 p-6 md:p-7">
+              <img
+                src={coachImg}
+                alt=""
+                width={900}
+                height={700}
+                loading="lazy"
+                className="pointer-events-none absolute inset-y-0 right-0 h-full w-1/2 object-cover opacity-[0.18] saturate-[0.9]"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-surface via-surface/90 to-surface/50" />
+              <div className="relative z-10 flex items-center gap-4">
                 <div className="grid size-12 place-items-center rounded-lg border border-ember/40 bg-ember/15">
                   <ShieldCheck className="size-6 text-ember" />
                 </div>
@@ -938,7 +964,7 @@ function Trust() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 border-t border-border/60 pt-5 text-sm leading-relaxed text-muted-foreground">
+              <div className="relative z-10 mt-6 border-t border-border/60 pt-5 text-sm leading-relaxed text-muted-foreground">
                 Indoor, outdoor, and custom programs with direct accountability and a clear training
                 plan before every block begins.
               </div>
@@ -971,31 +997,37 @@ function Logistics() {
       icon: Dumbbell,
       title: "Indoor sessions",
       body: "Private studio, partner gyms, or your building's gym — Alex brings the programming, you bring yourself.",
+      img: indoorImg,
     },
     {
       icon: Mountain,
       title: "Outdoor sessions",
       body: "Parks, beaches, running tracks, or any agreed location across the city.",
+      img: outdoorImg,
     },
     {
       icon: MapPin,
       title: "Areas covered",
       body: "West Hollywood · Beverly Hills · Santa Monica · Venice · Downtown LA",
+      img: heroImg,
     },
     {
       icon: Clock,
       title: "Session duration",
       body: "Choose 45, 60, or 75 minutes — whatever fits your schedule and goal block.",
+      img: undefined,
     },
     {
       icon: CheckCircle2,
       title: "What to bring",
       body: "Water, towel, training shoes. Equipment and programming handled by Alex.",
+      img: undefined,
     },
     {
       icon: Calendar,
       title: "Cancellation & payment",
       body: "Flexible 24h cancellation policy. Card, transfer, or package billing — all supported.",
+      img: undefined,
     },
   ];
 
@@ -1013,12 +1045,27 @@ function Logistics() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cards.map((c, i) => (
             <Reveal key={c.title} delay={i * 0.04}>
-              <div className="rounded-2xl border border-border/60 bg-background p-7 h-full hover:border-ember/40 transition-colors">
-                <div className="size-11 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
-                  <c.icon className="size-5 text-ember" />
+              <div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-background p-7 h-full hover:border-ember/40 transition-colors">
+                {c.img && (
+                  <>
+                    <img
+                      src={c.img}
+                      alt=""
+                      width={900}
+                      height={700}
+                      loading="lazy"
+                      className="pointer-events-none absolute inset-0 size-full object-cover opacity-[0.14] saturate-[0.9] transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.2]"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-background/90 to-background/58" />
+                  </>
+                )}
+                <div className="relative z-10">
+                  <div className="size-11 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
+                    <c.icon className="size-5 text-ember" />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold mt-5">{c.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{c.body}</p>
                 </div>
-                <h3 className="font-display text-lg font-semibold mt-5">{c.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{c.body}</p>
               </div>
             </Reveal>
           ))}
