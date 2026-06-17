@@ -36,7 +36,11 @@
   --color-ember-glow: var(--ember-glow);
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
+  --color-trident-accent: var(--trident-accent);
+  --color-trident-accent-glow: var(--trident-accent-glow);
+  --color-trident-accent-foreground: var(--trident-accent-foreground);
   --shadow-ember: 0 20px 60px -20px color-mix(in oklab, var(--ember) 45%, transparent);
+  --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
   --shadow-elevated: 0 30px 80px -30px oklch(0 0 0 / 0.7);
 }
 
@@ -73,6 +77,12 @@
   --border: oklch(0.32 0.006 30);
   --input: oklch(0.32 0.006 30);
   --ring: oklch(0.68 0.19 38);
+
+  /* Trident concept defaults (overridden on .trident-theme) */
+  --trident-accent: oklch(0.62 0.08 220);
+  --trident-accent-glow: oklch(0.72 0.1 215);
+  --trident-accent-foreground: oklch(0.97 0.005 220);
+  --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
 }
 
 @layer base {
@@ -190,5 +200,33 @@
     transform: translateZ(0);
     background-image: radial-gradient(rgba(255, 255, 255, 0.55) 1px, transparent 1px);
     background-size: 3px 3px;
+  }
+
+  /* Trident Fitness concept — scoped brand tokens */
+  .trident-theme {
+    --trident-accent: oklch(0.62 0.08 220);
+    --trident-accent-glow: oklch(0.72 0.1 215);
+    --trident-accent-foreground: oklch(0.97 0.005 220);
+    --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
+  }
+
+  .trident-theme .trident-headline-accent {
+    background: linear-gradient(
+      105deg,
+      var(--trident-accent) 0%,
+      var(--trident-accent-glow) 48%,
+      color-mix(in oklab, var(--foreground) 88%, var(--trident-accent-glow)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .trident-theme .trident-hero-glow {
+    background: radial-gradient(
+      ellipse 70% 55% at 50% 28%,
+      color-mix(in oklab, var(--trident-accent) 16%, transparent),
+      transparent 70%
+    );
   }
 }
