@@ -57,6 +57,7 @@ import {
 import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { buildLandingJsonLd } from "@/lib/landing-schema";
 import { getSiteOrigin } from "@/lib/site-url";
+import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -79,6 +80,18 @@ function isHomePath(pathname: string) {
   return pathname === "/" || pathname === "";
 }
 
+function isTridentPath(pathname: string) {
+  return pathname === "/trident" || pathname === "/trident/";
+}
+
+type AppRoute = "home" | "trident" | "404";
+
+function resolveRoute(pathname: string): AppRoute {
+  if (isHomePath(pathname)) return "home";
+  if (isTridentPath(pathname)) return "trident";
+  return "404";
+}
+
 function useLandingJsonLd() {
   useEffect(() => {
     const script = document.createElement("script");
@@ -90,18 +103,18 @@ function useLandingJsonLd() {
   }, []);
 }
 
-function useIsHomeRoute() {
-  const [isHome, setIsHome] = useState(() =>
-    typeof window === "undefined" ? true : isHomePath(window.location.pathname),
+function useAppRoute() {
+  const [route, setRoute] = useState<AppRoute>(() =>
+    typeof window === "undefined" ? "home" : resolveRoute(window.location.pathname),
   );
 
   useEffect(() => {
-    const sync = () => setIsHome(isHomePath(window.location.pathname));
+    const sync = () => setRoute(resolveRoute(window.location.pathname));
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
   }, []);
 
-  return isHome;
+  return route;
 }
 
 function NotFoundPage() {
@@ -133,12 +146,14 @@ function NotFoundPage() {
 }
 
 export default function App() {
-  const isHome = useIsHomeRoute();
+  const route = useAppRoute();
   useLandingJsonLd();
 
   return (
     <>
-      {isHome ? <LandingPage /> : <NotFoundPage />}
+      {route === "home" && <LandingPage />}
+      {route === "trident" && <TridentFitnessPage />}
+      {route === "404" && <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>
   );
