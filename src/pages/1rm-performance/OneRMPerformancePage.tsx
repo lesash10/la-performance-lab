@@ -4,13 +4,10 @@ import {
   ArrowRight,
   Award,
   CheckCircle2,
-  Dumbbell,
   MapPin,
   Menu,
   Phone,
-  Star,
   Target,
-  Users,
   X,
 } from "lucide-react";
 
@@ -20,6 +17,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Reveal } from "@/components/marketing/Reveal";
 import { cn } from "@/lib/utils";
+
+import indoorImg from "@/assets/service-indoor.jpg";
 
 const NAV = [
   { href: "#programs", label: "Programs" },
@@ -66,7 +65,8 @@ export function OneRMPerformancePage() {
       </a>
       <OneRMNav />
       <OneRMHero />
-      <OneRMProofStrip />
+      <OneRMTrustStrip />
+      <OneRMMeetBobby />
       <OneRMChoosePath />
       <OneRMHowToStart />
       <OneRMContact />
@@ -269,24 +269,37 @@ function OneRMHero() {
           </p>
         </div>
 
-        <div
-          className="relative mx-auto w-full max-w-md lg:max-w-none"
-          aria-hidden
-        >
-          <div className="onerm-hero-placeholder relative aspect-[4/5] overflow-hidden rounded-2xl border border-border/60 bg-surface/40 shadow-elevated">
-            <div className="absolute inset-0 bg-gradient-to-br from-onerm-accent/15 via-surface to-background" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-              <div className="grid size-16 place-items-center rounded-2xl border border-onerm-accent/30 bg-onerm-accent/10">
-                <Dumbbell className="size-8 text-onerm-accent" />
+        <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-onerm-accent/25 bg-surface shadow-elevated">
+            <img
+              src={indoorImg}
+              alt=""
+              width={800}
+              height={1000}
+              decoding="async"
+              className="absolute inset-0 size-full object-cover opacity-35 saturate-[0.85]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-background/30" />
+            <div className="absolute inset-0 bg-gradient-to-br from-onerm-accent/10 via-transparent to-transparent" />
+            <div className="relative flex h-full flex-col justify-between p-7 md:p-8">
+              <div className="flex justify-end">
+                <span className="rounded-full border border-onerm-accent/40 bg-onerm-accent/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-onerm-accent">
+                  First step
+                </span>
               </div>
-              <p className="text-center text-sm font-medium text-muted-foreground">
-                Athletic training environment
-              </p>
-              <p className="text-center text-xs text-muted-foreground/80">
-                Sorrento Valley · San Diego
-              </p>
+              <div>
+                <p className="font-display text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+                  Athlete Assessment
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  Movement • Strength • Training Plan
+                </p>
+                <div className="mt-6 flex items-center gap-2 border-t border-border/50 pt-5 text-xs text-muted-foreground">
+                  <MapPin className="size-3.5 shrink-0 text-onerm-accent" aria-hidden />
+                  San Diego, CA
+                </div>
+              </div>
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 to-transparent" />
           </div>
         </div>
       </motion.div>
@@ -294,50 +307,62 @@ function OneRMHero() {
   );
 }
 
-const PROOF_CARDS = [
-  {
-    icon: Users,
-    title: "Athlete-focused coaching",
-    body: "Programs built around how athletes move, compete, and recover.",
-  },
-  {
-    icon: Dumbbell,
-    title: "Strength & conditioning expertise",
-    body: "Science-backed training for strength, power, speed, and durability.",
-  },
-  {
-    icon: Star,
-    title: "Reviews and client results",
-    body: "Athletes and parents trust the process — results speak for themselves.",
-  },
-  {
-    icon: MapPin,
-    title: "San Diego training environment",
-    body: "A dedicated facility in Sorrento Valley built for serious training.",
-  },
+const TRUST_ITEMS = [
+  "Trusted by athletes across San Diego",
+  "Strength & conditioning expertise",
+  "Performance-focused coaching",
+  "Reviews and athlete results",
 ] as const;
 
-function OneRMProofStrip() {
+function OneRMTrustStrip() {
   return (
-    <section id="reviews" className="relative overflow-hidden border-y border-border/50 py-16 md:py-20">
+    <section id="reviews" className="relative border-y border-border/50 py-8 md:py-10">
+      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+        <ul className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-8 sm:gap-y-3">
+          {TRUST_ITEMS.map((item) => (
+            <li
+              key={item}
+              className="flex items-center gap-2.5 text-sm text-muted-foreground"
+            >
+              <CheckCircle2 className="size-4 shrink-0 text-onerm-accent" aria-hidden />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function OneRMMeetBobby() {
+  return (
+    <section className="relative py-20 md:py-28">
       <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
       <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PROOF_CARDS.map((card) => (
-              <div
-                key={card.title}
-                className="flex h-full flex-col rounded-2xl border border-border/60 bg-surface/30 p-6"
-              >
-                <div className="grid size-10 place-items-center rounded-lg border border-onerm-accent/30 bg-onerm-accent/10">
-                  <card.icon className="size-5 text-onerm-accent" />
-                </div>
-                <h3 className="mt-4 font-display text-lg font-semibold">{card.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {card.body}
-                </p>
-              </div>
-            ))}
+          <div className="grid gap-10 rounded-2xl border border-border/60 bg-surface/30 p-8 md:grid-cols-[auto_1fr] md:items-center md:gap-12 md:p-10">
+            <div
+              className="mx-auto grid size-28 shrink-0 place-items-center rounded-2xl border border-onerm-accent/30 bg-gradient-to-br from-onerm-accent/20 to-surface font-display text-3xl font-semibold tracking-tight text-onerm-accent md:mx-0 md:size-32 md:text-4xl"
+              aria-hidden
+            >
+              BC
+            </div>
+            <div className="text-center md:text-left">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-onerm-accent">
+                Meet Bobby
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+                Bobby Congalton
+              </h2>
+              <p className="mt-2 text-sm font-medium text-foreground/90">
+                Strength &amp; Conditioning Coach
+              </p>
+              <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground md:mx-0 md:text-base">
+                Bobby helps athletes build strength, improve movement, and train with a structured
+                plan built around their sport, goals, and development stage.
+              </p>
+            </div>
           </div>
         </Reveal>
       </div>
