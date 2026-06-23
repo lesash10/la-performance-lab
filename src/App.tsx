@@ -57,6 +57,7 @@ import {
 import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { buildLandingJsonLd } from "@/lib/landing-schema";
 import { getSiteOrigin } from "@/lib/site-url";
+import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
 import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
 
@@ -84,11 +85,16 @@ function isTridentPath(pathname: string) {
   return pathname === "/trident" || pathname === "/trident/";
 }
 
-type AppRoute = "home" | "trident" | "404";
+function isOneRMPath(pathname: string) {
+  return pathname === "/1rm-performance" || pathname === "/1rm-performance/";
+}
+
+type AppRoute = "home" | "trident" | "onerm" | "404";
 
 function resolveRoute(pathname: string): AppRoute {
   if (isHomePath(pathname)) return "home";
   if (isTridentPath(pathname)) return "trident";
+  if (isOneRMPath(pathname)) return "onerm";
   return "404";
 }
 
@@ -153,6 +159,7 @@ export default function App() {
     <>
       {route === "home" && <LandingPage />}
       {route === "trident" && <TridentFitnessPage />}
+      {route === "onerm" && <OneRMPerformancePage />}
       {route === "404" && <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>
