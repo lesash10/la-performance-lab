@@ -39,8 +39,12 @@
   --color-trident-accent: var(--trident-accent);
   --color-trident-accent-glow: var(--trident-accent-glow);
   --color-trident-accent-foreground: var(--trident-accent-foreground);
+  --color-onerm-accent: var(--onerm-accent);
+  --color-onerm-accent-glow: var(--onerm-accent-glow);
+  --color-onerm-accent-foreground: var(--onerm-accent-foreground);
   --shadow-ember: 0 20px 60px -20px color-mix(in oklab, var(--ember) 45%, transparent);
   --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
+  --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
   --shadow-elevated: 0 30px 80px -30px oklch(0 0 0 / 0.7);
 }
 
@@ -83,6 +87,12 @@
   --trident-accent-glow: oklch(0.72 0.1 215);
   --trident-accent-foreground: oklch(0.97 0.005 220);
   --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
+
+  /* 1RM Performance concept defaults (overridden on .onerm-theme) */
+  --onerm-accent: oklch(0.56 0.1 150);
+  --onerm-accent-glow: oklch(0.66 0.11 155);
+  --onerm-accent-foreground: oklch(0.14 0.02 150);
+  --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
 }
 
 @layer base {
@@ -226,6 +236,34 @@
     background: radial-gradient(
       ellipse 70% 55% at 50% 28%,
       color-mix(in oklab, var(--trident-accent) 16%, transparent),
+      transparent 70%
+    );
+  }
+
+  /* 1RM Performance concept — scoped brand tokens */
+  .onerm-theme {
+    --onerm-accent: oklch(0.56 0.1 150);
+    --onerm-accent-glow: oklch(0.66 0.11 155);
+    --onerm-accent-foreground: oklch(0.14 0.02 150);
+    --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
+  }
+
+  .onerm-theme .onerm-headline-accent {
+    background: linear-gradient(
+      105deg,
+      var(--onerm-accent) 0%,
+      var(--onerm-accent-glow) 48%,
+      color-mix(in oklab, var(--foreground) 88%, var(--onerm-accent-glow)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .onerm-theme .onerm-hero-glow {
+    background: radial-gradient(
+      ellipse 70% 55% at 50% 28%,
+      color-mix(in oklab, var(--onerm-accent) 14%, transparent),
       transparent 70%
     );
   }
