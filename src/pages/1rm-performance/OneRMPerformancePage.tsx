@@ -1,15 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import {
-  ArrowRight,
-  Award,
-  CheckCircle2,
-  MapPin,
-  Menu,
-  Phone,
-  Target,
-  X,
-} from "lucide-react";
+import { ArrowRight, Award, CheckCircle2, MapPin, Menu, Phone, Target, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,15 +32,7 @@ function OneRMLogo({ className }: { className?: string }) {
         strokeWidth="1.75"
         strokeLinecap="round"
       />
-      <rect
-        x="4"
-        y="5"
-        width="16"
-        height="14"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.75"
-      />
+      <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.75" />
     </svg>
   );
 }
@@ -321,10 +304,7 @@ function OneRMTrustStrip() {
       <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         <ul className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-8 sm:gap-y-3">
           {TRUST_ITEMS.map((item) => (
-            <li
-              key={item}
-              className="flex items-center gap-2.5 text-sm text-muted-foreground"
-            >
+            <li key={item} className="flex items-center gap-2.5 text-sm text-muted-foreground">
               <CheckCircle2 className="size-4 shrink-0 text-onerm-accent" aria-hidden />
               <span>{item}</span>
             </li>
@@ -467,8 +447,8 @@ function OneRMHowToStart() {
               Three steps to get training.
             </h2>
             <p className="mt-5 leading-relaxed text-muted-foreground">
-              No guesswork about what comes first — the assessment is the clear entry point for every
-              athlete.
+              No guesswork about what comes first — the assessment is the clear entry point for
+              every athlete.
             </p>
           </div>
         </Reveal>
@@ -581,10 +561,7 @@ function OneRMContact() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="onerm-athlete">Athlete type</Label>
-                    <Input
-                      id="onerm-athlete"
-                      placeholder="Youth, high school, college, adult…"
-                    />
+                    <Input id="onerm-athlete" placeholder="Youth, high school, college, adult…" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="onerm-message">Goals or questions</Label>

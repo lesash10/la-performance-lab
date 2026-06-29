@@ -58,6 +58,7 @@ import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { buildLandingJsonLd } from "@/lib/landing-schema";
 import { getSiteOrigin } from "@/lib/site-url";
 import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
+import { SpryPrototypePage } from "@/pages/spry-fitness/SpryPrototypePage";
 import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
 
@@ -89,12 +90,22 @@ function isOneRMPath(pathname: string) {
   return pathname === "/1rm-performance" || pathname === "/1rm-performance/";
 }
 
-type AppRoute = "home" | "trident" | "onerm" | "404";
+function isSpryPath(pathname: string) {
+  return (
+    pathname === "/spry" ||
+    pathname === "/spry/" ||
+    pathname === "/spry-fitness-prototype" ||
+    pathname === "/spry-fitness-prototype/"
+  );
+}
+
+type AppRoute = "home" | "trident" | "onerm" | "spry" | "404";
 
 function resolveRoute(pathname: string): AppRoute {
   if (isHomePath(pathname)) return "home";
   if (isTridentPath(pathname)) return "trident";
   if (isOneRMPath(pathname)) return "onerm";
+  if (isSpryPath(pathname)) return "spry";
   return "404";
 }
 
@@ -160,6 +171,7 @@ export default function App() {
       {route === "home" && <LandingPage />}
       {route === "trident" && <TridentFitnessPage />}
       {route === "onerm" && <OneRMPerformancePage />}
+      {route === "spry" && <SpryPrototypePage />}
       {route === "404" && <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>
