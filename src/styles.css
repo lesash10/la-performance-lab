@@ -42,9 +42,13 @@
   --color-onerm-accent: var(--onerm-accent);
   --color-onerm-accent-glow: var(--onerm-accent-glow);
   --color-onerm-accent-foreground: var(--onerm-accent-foreground);
+  --color-spry-accent: var(--spry-accent);
+  --color-spry-accent-muted: var(--spry-accent-muted);
+  --color-spry-accent-foreground: var(--spry-accent-foreground);
   --shadow-ember: 0 20px 60px -20px color-mix(in oklab, var(--ember) 45%, transparent);
   --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
   --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
+  --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
   --shadow-elevated: 0 30px 80px -30px oklch(0 0 0 / 0.7);
 }
 
@@ -93,6 +97,12 @@
   --onerm-accent-glow: oklch(0.66 0.11 155);
   --onerm-accent-foreground: oklch(0.14 0.02 150);
   --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
+
+  /* Spry Fitness concept defaults (overridden on .spry-theme) */
+  --spry-accent: oklch(0.97 0.005 60);
+  --spry-accent-muted: oklch(0.72 0.008 60);
+  --spry-accent-foreground: oklch(0.12 0.005 30);
+  --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
 }
 
 @layer base {
@@ -266,5 +276,181 @@
       color-mix(in oklab, var(--onerm-accent) 14%, transparent),
       transparent 70%
     );
+  }
+
+  /* Spry Fitness concept — black & white premium */
+  .spry-theme {
+    --background: oklch(0.12 0.004 30);
+    --surface: oklch(0.17 0.005 30);
+    --surface-elevated: oklch(0.21 0.006 30);
+    --border: oklch(0.28 0.006 30);
+    --muted-foreground: oklch(0.68 0.008 60);
+    --spry-accent: oklch(0.97 0.005 60);
+    --spry-accent-muted: oklch(0.72 0.008 60);
+    --spry-accent-foreground: oklch(0.12 0.005 30);
+    --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
+  }
+
+  .spry-theme .spry-hero-glow {
+    background: radial-gradient(
+      ellipse 65% 50% at 30% 20%,
+      color-mix(in oklab, var(--foreground) 6%, transparent),
+      transparent 72%
+    );
+  }
+
+  .spry-theme .spry-image-placeholder {
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in oklab, var(--surface-elevated) 85%, var(--foreground) 6%) 0%,
+        var(--surface) 45%,
+        color-mix(in oklab, var(--background) 92%, var(--foreground) 3%) 100%
+      );
+  }
+
+  .spry-theme .spry-editorial-frame {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent),
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+
+  .spry-theme .spry-editorial-vignette::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 85% 75% at 50% 45%,
+      transparent 35%,
+      color-mix(in oklab, var(--background) 55%, transparent) 100%
+    );
+  }
+
+  .spry-theme .spry-section-glow {
+    background: radial-gradient(
+      ellipse 70% 50% at 50% 0%,
+      color-mix(in oklab, var(--foreground) 4%, transparent),
+      transparent 70%
+    );
+  }
+
+  .spry-theme .spry-section-glow-left {
+    background: radial-gradient(
+      ellipse 55% 45% at 0% 40%,
+      color-mix(in oklab, var(--foreground) 3.5%, transparent),
+      transparent 68%
+    );
+  }
+
+  .spry-theme .spry-section-glow-right {
+    background: radial-gradient(
+      ellipse 50% 42% at 100% 55%,
+      color-mix(in oklab, var(--foreground) 3%, transparent),
+      transparent 70%
+    );
+  }
+
+  .spry-theme section[id] {
+    scroll-margin-top: 5.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .spry-theme section[id] {
+      scroll-margin-top: 6.25rem;
+    }
+  }
+
+  .spry-theme .spry-card {
+    position: relative;
+    border-radius: 1.35rem;
+    border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+    background: color-mix(in oklab, var(--surface) 42%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent),
+      0 1px 0 color-mix(in oklab, var(--foreground) 2%, transparent);
+    transition:
+      transform 0.22s ease,
+      border-color 0.22s ease,
+      background-color 0.22s ease,
+      box-shadow 0.22s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spry-theme .spry-card {
+      transition: none;
+    }
+  }
+
+  .spry-theme .spry-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--foreground) 14%, var(--border));
+    background: color-mix(in oklab, var(--surface) 58%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent),
+      0 14px 44px -22px oklch(0 0 0 / 0.62);
+  }
+
+  .spry-theme .spry-icon-box {
+    display: grid;
+    place-items: center;
+    border-radius: 0.85rem;
+    border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+    background: color-mix(in oklab, var(--surface-elevated) 88%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent);
+    transition: border-color 0.22s ease, background-color 0.22s ease;
+  }
+
+  .spry-theme .spry-card:hover .spry-icon-box {
+    border-color: color-mix(in oklab, var(--foreground) 12%, var(--border));
+    background: color-mix(in oklab, var(--background) 35%, var(--surface-elevated));
+  }
+
+  .spry-theme .spry-panel {
+    border-radius: 1.75rem;
+    border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+    background: color-mix(in oklab, var(--surface) 28%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent),
+      0 24px 64px -40px oklch(0 0 0 / 0.55);
+  }
+
+  .spry-theme .spry-image-slot::before {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    border-radius: 1rem;
+    border: 1px dashed color-mix(in oklab, var(--foreground) 10%, transparent);
+    pointer-events: none;
+  }
+
+  .spry-theme .spry-image-slot::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 38%;
+    width: 1px;
+    height: 18%;
+    transform: translateX(-50%);
+    background: color-mix(in oklab, var(--foreground) 8%, transparent);
+    pointer-events: none;
+  }
+
+  .spry-theme .spry-cta-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .spry-theme .group:hover .spry-cta-arrow,
+  .spry-theme .group:focus-visible .spry-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spry-theme .spry-cta-arrow {
+      transition: none;
+    }
+    .spry-theme .spry-card:hover {
+      transform: none;
+    }
   }
 }
