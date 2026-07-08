@@ -58,6 +58,7 @@ import { MARKETING_FAQS } from "@/lib/marketing-faq";
 import { buildLandingJsonLd } from "@/lib/landing-schema";
 import { getSiteOrigin } from "@/lib/site-url";
 import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
+import { KalosSthenosPage } from "@/pages/kalos-sthenos/KalosSthenosPage";
 import { SpryPrototypePage } from "@/pages/spry-fitness/SpryPrototypePage";
 import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
@@ -99,13 +100,23 @@ function isSpryPath(pathname: string) {
   );
 }
 
-type AppRoute = "home" | "trident" | "onerm" | "spry" | "404";
+function isKalosPath(pathname: string) {
+  return (
+    pathname === "/kalos-sthenos" ||
+    pathname === "/kalos-sthenos/" ||
+    pathname === "/kalos" ||
+    pathname === "/kalos/"
+  );
+}
+
+type AppRoute = "home" | "trident" | "onerm" | "spry" | "kalos" | "404";
 
 function resolveRoute(pathname: string): AppRoute {
   if (isHomePath(pathname)) return "home";
   if (isTridentPath(pathname)) return "trident";
   if (isOneRMPath(pathname)) return "onerm";
   if (isSpryPath(pathname)) return "spry";
+  if (isKalosPath(pathname)) return "kalos";
   return "404";
 }
 
@@ -172,6 +183,7 @@ export default function App() {
       {route === "trident" && <TridentFitnessPage />}
       {route === "onerm" && <OneRMPerformancePage />}
       {route === "spry" && <SpryPrototypePage />}
+      {route === "kalos" && <KalosSthenosPage />}
       {route === "404" && <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>
