@@ -45,10 +45,14 @@
   --color-spry-accent: var(--spry-accent);
   --color-spry-accent-muted: var(--spry-accent-muted);
   --color-spry-accent-foreground: var(--spry-accent-foreground);
+  --color-kalos-accent: var(--kalos-accent);
+  --color-kalos-accent-glow: var(--kalos-accent-glow);
+  --color-kalos-accent-foreground: var(--kalos-accent-foreground);
   --shadow-ember: 0 20px 60px -20px color-mix(in oklab, var(--ember) 45%, transparent);
   --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
   --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
   --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
+  --shadow-kalos: 0 20px 60px -20px color-mix(in oklab, var(--kalos-accent) 35%, transparent);
   --shadow-elevated: 0 30px 80px -30px oklch(0 0 0 / 0.7);
 }
 
@@ -103,6 +107,12 @@
   --spry-accent-muted: oklch(0.72 0.008 60);
   --spry-accent-foreground: oklch(0.12 0.005 30);
   --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
+
+  /* Kalos Sthenos concept defaults (overridden on .kalos-theme) */
+  --kalos-accent: oklch(0.74 0.11 68);
+  --kalos-accent-glow: oklch(0.82 0.1 72);
+  --kalos-accent-foreground: oklch(0.14 0.02 68);
+  --shadow-kalos: 0 20px 60px -20px color-mix(in oklab, var(--kalos-accent) 35%, transparent);
 }
 
 @layer base {
@@ -451,6 +461,147 @@
     }
     .spry-theme .spry-card:hover {
       transform: none;
+    }
+  }
+
+  /* Kalos Sthenos — athletic bronze on charcoal */
+  .kalos-theme {
+    --background: oklch(0.14 0.005 35);
+    --surface: oklch(0.19 0.006 35);
+    --surface-elevated: oklch(0.23 0.007 35);
+    --border: oklch(0.3 0.006 35);
+    --muted-foreground: oklch(0.7 0.008 60);
+    --kalos-accent: oklch(0.74 0.11 68);
+    --kalos-accent-glow: oklch(0.82 0.1 72);
+    --kalos-accent-foreground: oklch(0.14 0.02 68);
+    --shadow-kalos: 0 20px 60px -20px color-mix(in oklab, var(--kalos-accent) 35%, transparent);
+  }
+
+  .kalos-theme .kalos-hero-glow {
+    background: radial-gradient(
+      ellipse 70% 55% at 50% 30%,
+      color-mix(in oklab, var(--kalos-accent) 10%, transparent),
+      transparent 72%
+    );
+  }
+
+  .kalos-theme section[id] {
+    scroll-margin-top: 5.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .kalos-theme section[id] {
+      scroll-margin-top: 6.25rem;
+    }
+  }
+
+  .kalos-theme .kalos-card {
+    position: relative;
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+    background: color-mix(in oklab, var(--surface) 50%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
+    transition:
+      transform 0.28s ease,
+      border-color 0.28s ease,
+      background-color 0.28s ease,
+      box-shadow 0.28s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kalos-theme .kalos-card {
+      transition: none;
+    }
+  }
+
+  .kalos-theme .kalos-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--kalos-accent) 35%, var(--border));
+    background: color-mix(in oklab, var(--surface) 72%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--kalos-accent) 12%, transparent),
+      0 16px 48px -16px color-mix(in oklab, var(--kalos-accent) 22%, transparent);
+  }
+
+  .kalos-theme .kalos-section-alt {
+    background: color-mix(in oklab, var(--surface) 55%, var(--background));
+  }
+
+  .kalos-theme .kalos-section-elevated {
+    background: color-mix(in oklab, var(--surface-elevated) 35%, var(--background));
+  }
+
+  .kalos-theme .kalos-icon-box {
+    display: grid;
+    place-items: center;
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--kalos-accent) 20%, var(--border));
+    background: color-mix(in oklab, var(--kalos-accent) 8%, var(--surface-elevated));
+  }
+
+  .kalos-theme .kalos-panel {
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+    background: color-mix(in oklab, var(--surface) 35%, transparent);
+    box-shadow: 0 24px 64px -40px oklch(0 0 0 / 0.55);
+    transition:
+      border-color 0.28s ease,
+      box-shadow 0.28s ease;
+  }
+
+  .kalos-theme .kalos-panel:hover {
+    border-color: color-mix(in oklab, var(--kalos-accent) 20%, var(--border));
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--kalos-accent) 8%, transparent),
+      0 24px 64px -32px color-mix(in oklab, var(--kalos-accent) 15%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kalos-theme .kalos-panel:hover {
+      box-shadow: 0 24px 64px -40px oklch(0 0 0 / 0.55);
+    }
+  }
+
+  .kalos-theme .kalos-benefit-row {
+    transition:
+      transform 0.28s ease,
+      border-color 0.28s ease,
+      box-shadow 0.28s ease;
+  }
+
+  .kalos-theme .kalos-benefit-row:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--kalos-accent) 28%, var(--border));
+    box-shadow: 0 12px 40px -20px color-mix(in oklab, var(--kalos-accent) 18%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kalos-theme .kalos-benefit-row:hover {
+      transform: none;
+    }
+  }
+
+  .kalos-theme .kalos-image-placeholder {
+    background: linear-gradient(
+      165deg,
+      color-mix(in oklab, var(--surface-elevated) 85%, var(--foreground) 4%) 0%,
+      var(--surface) 50%,
+      color-mix(in oklab, var(--background) 92%, var(--foreground) 2%) 100%
+    );
+  }
+
+  .kalos-theme .group:hover .kalos-cta-arrow,
+  .kalos-theme .group:focus-visible .kalos-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kalos-theme .kalos-card:hover {
+      transform: none;
+    }
+    .kalos-theme .kalos-cta-arrow {
+      transition: none;
     }
   }
 }
