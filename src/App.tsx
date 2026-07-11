@@ -59,6 +59,7 @@ import { buildLandingJsonLd } from "@/lib/landing-schema";
 import { getSiteOrigin } from "@/lib/site-url";
 import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
 import { KalosSthenosPage } from "@/pages/kalos-sthenos/KalosSthenosPage";
+import { MichaelsWellnessPage } from "@/pages/michaels-wellness/MichaelsWellnessPage";
 import { SpryPrototypePage } from "@/pages/spry-fitness/SpryPrototypePage";
 import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
@@ -109,7 +110,16 @@ function isKalosPath(pathname: string) {
   );
 }
 
-type AppRoute = "home" | "trident" | "onerm" | "spry" | "kalos" | "404";
+function isMichaelPath(pathname: string) {
+  return (
+    pathname === "/michaels-wellness" ||
+    pathname === "/michaels-wellness/" ||
+    pathname === "/michaels-wellness-center" ||
+    pathname === "/michaels-wellness-center/"
+  );
+}
+
+type AppRoute = "home" | "trident" | "onerm" | "spry" | "kalos" | "michael" | "404";
 
 function resolveRoute(pathname: string): AppRoute {
   if (isHomePath(pathname)) return "home";
@@ -117,6 +127,7 @@ function resolveRoute(pathname: string): AppRoute {
   if (isOneRMPath(pathname)) return "onerm";
   if (isSpryPath(pathname)) return "spry";
   if (isKalosPath(pathname)) return "kalos";
+  if (isMichaelPath(pathname)) return "michael";
   return "404";
 }
 
@@ -184,6 +195,7 @@ export default function App() {
       {route === "onerm" && <OneRMPerformancePage />}
       {route === "spry" && <SpryPrototypePage />}
       {route === "kalos" && <KalosSthenosPage />}
+      {route === "michael" && <MichaelsWellnessPage />}
       {route === "404" && <NotFoundPage />}
       <Toaster theme="dark" position="top-center" richColors />
     </>

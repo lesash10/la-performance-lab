@@ -48,11 +48,16 @@
   --color-kalos-accent: var(--kalos-accent);
   --color-kalos-accent-glow: var(--kalos-accent-glow);
   --color-kalos-accent-foreground: var(--kalos-accent-foreground);
+  --color-michael-accent: var(--michael-accent);
+  --color-michael-accent-glow: var(--michael-accent-glow);
+  --color-michael-accent-foreground: var(--michael-accent-foreground);
+  --color-michael-accent-muted: var(--michael-accent-muted);
   --shadow-ember: 0 20px 60px -20px color-mix(in oklab, var(--ember) 45%, transparent);
   --shadow-trident: 0 20px 60px -20px color-mix(in oklab, var(--trident-accent) 40%, transparent);
   --shadow-onerm: 0 20px 60px -20px color-mix(in oklab, var(--onerm-accent) 40%, transparent);
   --shadow-spry: 0 24px 64px -24px oklch(0 0 0 / 0.55);
   --shadow-kalos: 0 20px 60px -20px color-mix(in oklab, var(--kalos-accent) 35%, transparent);
+  --shadow-michael: 0 16px 48px -16px color-mix(in oklab, var(--michael-accent) 28%, transparent);
   --shadow-elevated: 0 30px 80px -30px oklch(0 0 0 / 0.7);
 }
 
@@ -113,6 +118,13 @@
   --kalos-accent-glow: oklch(0.82 0.1 72);
   --kalos-accent-foreground: oklch(0.14 0.02 68);
   --shadow-kalos: 0 20px 60px -20px color-mix(in oklab, var(--kalos-accent) 35%, transparent);
+
+  /* Michael's Wellness Center concept defaults (overridden on .michael-theme) */
+  --michael-accent: oklch(0.52 0.18 255);
+  --michael-accent-glow: oklch(0.62 0.16 250);
+  --michael-accent-muted: oklch(0.92 0.04 245);
+  --michael-accent-foreground: oklch(0.99 0.002 255);
+  --shadow-michael: 0 16px 48px -16px color-mix(in oklab, var(--michael-accent) 28%, transparent);
 }
 
 @layer base {
@@ -601,6 +613,236 @@
       transform: none;
     }
     .kalos-theme .kalos-cta-arrow {
+      transition: none;
+    }
+  }
+
+  /* Michael's Wellness Center — warm light theme, brand blue #036bd6 */
+  .michael-theme {
+    color-scheme: light;
+    --background: oklch(0.993 0.007 88);
+    --foreground: oklch(0.29 0.028 58);
+    --surface: oklch(0.968 0.014 82);
+    --surface-elevated: oklch(0.948 0.018 78);
+    --card: oklch(0.991 0.006 90);
+    --card-foreground: oklch(0.29 0.028 58);
+    --border: oklch(0.89 0.014 74);
+    --input: oklch(0.91 0.012 76);
+    --muted: oklch(0.955 0.012 80);
+    --muted-foreground: oklch(0.49 0.022 62);
+    --ring: oklch(0.52 0.18 255);
+    --michael-warm: oklch(0.96 0.022 72);
+    --michael-warm-deep: oklch(0.935 0.028 68);
+    --michael-cream: oklch(0.978 0.016 85);
+    --michael-accent: oklch(0.52 0.18 255);
+    --michael-accent-glow: oklch(0.62 0.15 252);
+    --michael-accent-muted: oklch(0.94 0.038 88);
+    --michael-accent-foreground: oklch(0.99 0.002 255);
+    --shadow-michael: 0 18px 44px -18px color-mix(in oklab, var(--michael-accent) 22%, oklch(0.35 0.03 55 / 0.12));
+  }
+
+  .michael-theme .michael-hero-glow {
+    background:
+      radial-gradient(
+        ellipse 80% 55% at 15% 0%,
+        color-mix(in oklab, var(--michael-accent-muted) 70%, transparent),
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 65% 50% at 85% 10%,
+        color-mix(in oklab, var(--michael-warm) 80%, transparent),
+        transparent 72%
+      );
+  }
+
+  .michael-theme .michael-section-divider {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklab, var(--border) 65%, var(--michael-warm-deep)) 20%,
+      color-mix(in oklab, var(--border) 65%, var(--michael-warm-deep)) 80%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  .michael-theme section[id] {
+    scroll-margin-top: 5.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .michael-theme section[id] {
+      scroll-margin-top: 6.25rem;
+    }
+  }
+
+  .michael-theme .michael-card {
+    position: relative;
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+    background: linear-gradient(
+      165deg,
+      var(--card) 0%,
+      color-mix(in oklab, var(--card) 92%, var(--michael-warm) 8%) 100%
+    );
+    box-shadow:
+      0 1px 2px oklch(0.35 0.03 55 / 0.04),
+      0 10px 36px -14px oklch(0.35 0.03 55 / 0.07);
+    transition:
+      transform 0.32s ease,
+      border-color 0.32s ease,
+      box-shadow 0.32s ease,
+      background 0.32s ease;
+  }
+
+  .michael-theme .michael-card-tone-0 {
+    background: linear-gradient(
+      165deg,
+      var(--card) 0%,
+      color-mix(in oklab, var(--card) 90%, var(--michael-cream) 10%) 100%
+    );
+  }
+
+  .michael-theme .michael-card-tone-1 {
+    background: linear-gradient(
+      165deg,
+      color-mix(in oklab, var(--card) 94%, var(--michael-accent-muted) 6%) 0%,
+      var(--card) 100%
+    );
+  }
+
+  .michael-theme .michael-card-tone-2 {
+    background: linear-gradient(
+      165deg,
+      var(--card) 0%,
+      color-mix(in oklab, var(--card) 88%, var(--michael-warm) 12%) 100%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .michael-theme .michael-card {
+      transition: none;
+    }
+  }
+
+  .michael-theme .michael-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--michael-accent) 18%, var(--border));
+    box-shadow:
+      0 1px 2px oklch(0.35 0.03 55 / 0.05),
+      0 22px 52px -18px color-mix(in oklab, var(--michael-accent) 14%, oklch(0.35 0.03 55 / 0.1));
+  }
+
+  .michael-theme .michael-card-secondary {
+    border-radius: 1rem;
+    border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--michael-warm) 55%, var(--background)) 0%,
+      color-mix(in oklab, var(--surface) 70%, var(--background)) 100%
+    );
+    box-shadow: 0 6px 24px -14px oklch(0.35 0.03 55 / 0.06);
+  }
+
+  .michael-theme .michael-section-alt {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--michael-warm) 45%, var(--background)) 0%,
+      color-mix(in oklab, var(--surface) 80%, var(--background)) 100%
+    );
+  }
+
+  .michael-theme .michael-section-muted {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--michael-warm-deep) 35%, var(--background)) 0%,
+      color-mix(in oklab, var(--michael-cream) 50%, var(--background)) 100%
+    );
+  }
+
+  .michael-theme .michael-icon-box {
+    display: grid;
+    place-items: center;
+    border-radius: 0.875rem;
+    border: 1px solid color-mix(in oklab, var(--michael-accent) 12%, var(--border));
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--michael-accent-muted) 70%, var(--card)) 0%,
+      color-mix(in oklab, var(--michael-warm) 60%, var(--card)) 100%
+    );
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 3%, transparent);
+  }
+
+  .michael-theme .michael-panel {
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+    background: linear-gradient(
+      165deg,
+      var(--card) 0%,
+      color-mix(in oklab, var(--card) 90%, var(--michael-cream) 10%) 100%
+    );
+    box-shadow:
+      0 1px 2px oklch(0.35 0.03 55 / 0.04),
+      0 22px 56px -30px oklch(0.35 0.03 55 / 0.1);
+  }
+
+  .michael-theme .michael-step-number {
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in oklab, var(--michael-accent) 55%, var(--muted-foreground));
+  }
+
+  .michael-theme .michael-photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+    box-shadow:
+      0 1px 2px oklch(0.35 0.03 55 / 0.05),
+      0 20px 52px -22px oklch(0.35 0.03 55 / 0.14);
+  }
+
+  .michael-theme .michael-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .michael-theme .michael-trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+    background: color-mix(in oklab, var(--card) 88%, var(--michael-warm) 12%);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    box-shadow: 0 4px 16px -10px oklch(0.35 0.03 55 / 0.08);
+  }
+
+  .michael-theme .michael-footer {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--michael-warm) 40%, var(--background)) 0%,
+      var(--background) 100%
+    );
+  }
+
+  .michael-theme .group:hover .michael-cta-arrow,
+  .michael-theme .group:focus-visible .michael-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .michael-theme .michael-card:hover {
+      transform: none;
+    }
+    .michael-theme .michael-cta-arrow {
       transition: none;
     }
   }
