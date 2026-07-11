@@ -838,6 +838,12 @@
     transform: translateX(3px);
   }
 
+  @media (max-width: 767px) {
+    .michael-theme section[id] {
+      scroll-margin-top: 5.25rem;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .michael-theme .michael-card:hover {
       transform: none;
