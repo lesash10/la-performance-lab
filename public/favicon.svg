@@ -1,6 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Alex Carter training mark">
-  <rect width="64" height="64" rx="14" fill="#171412" />
-  <path d="M18 42h28" stroke="#f06a3d" stroke-width="6" stroke-linecap="square" />
-  <path d="M14 36v12M50 36v12" stroke="#f06a3d" stroke-width="6" stroke-linecap="square" />
-  <path d="M35 10 22 34h12l-5 20 15-28H32l3-16Z" fill="#ffd08a" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Incinerate Fitness">
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <defs>
+    <linearGradient id="flame" x1="20" y1="52" x2="44" y2="8" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D67119"/>
+      <stop offset="0.55" stop-color="#E09B57"/>
+      <stop offset="1" stop-color="#FFBC7D"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#flame)" d="M32 8c2 8-6 12-4 22 1 6 6 9 6 9s-10 2-10 12c0 8 6 13 14 13s14-5 14-13c0-14-12-20-14-30-1-5 1-9-6-13z"/>
+  <circle cx="34" cy="44" r="7" fill="#f5f5f5"/>
 </svg>

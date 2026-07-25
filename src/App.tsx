@@ -7,40 +7,32 @@ import { z } from "zod";
 import { toast } from "sonner";
 import {
   ArrowRight,
-  Calendar,
   CheckCircle2,
   Clock,
-  Dumbbell,
   Flame,
-  Globe2,
   Instagram,
-  LineChart,
   Mail,
   MapPin,
   Menu,
-  Mountain,
+  Phone,
   ShieldCheck,
-  Sparkles,
   Target,
-  Timer,
   Users,
   X,
-  Zap,
 } from "lucide-react";
 
-import indoorImg from "@/assets/service-indoor.jpg";
-import outdoorImg from "@/assets/service-outdoor.jpg";
-import customImg from "@/assets/service-custom.jpg";
-import heroImg from "@/assets/hero.jpg";
-import coachImg from "@/assets/trust-coach.jpg";
-import t1 from "@/assets/transformation-1.jpg";
-import t2 from "@/assets/transformation-2.jpg";
-import t3 from "@/assets/transformation-3.jpg";
+import logoImg from "@/assets/incinerate/logo.png";
+import markImg from "@/assets/incinerate/mark.png";
+import rogerCoachImg from "@/assets/incinerate/roger-coach.jpg";
+import coachImg from "@/assets/incinerate/coach.jpg";
+import trainingImg from "@/assets/incinerate/training.jpg";
+import facilityImg from "@/assets/incinerate/facility.jpg";
+import boxingImg from "@/assets/incinerate/boxing.jpg";
+import gym3 from "@/assets/incinerate/gym3.jpg";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -65,20 +57,42 @@ import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "#services", label: "Services" },
-  { href: "#schedule", label: "Schedule" },
-  { href: "#why", label: "Why Alex" },
-  { href: "#logistics", label: "Logistics" },
+  { href: "#why", label: "Why Here" },
+  { href: "#programs", label: "Programs" },
+  { href: "#results", label: "Results" },
+  { href: "#process", label: "How It Works" },
+  { href: "#appointments", label: "Times" },
   { href: "#faq", label: "FAQ" },
-  { href: "#booking", label: "Book" },
 ];
 
 const MOBILE_NAV_PANEL_ID = "site-mobile-nav-panel";
 const JSON_LD_SCRIPT_ID = "landing-jsonld";
 const PRIMARY_CTA_CLASS =
-  "rounded-lg bg-ember px-7 font-semibold tracking-[0.01em] text-background shadow-ember hover:-translate-y-0.5 hover:bg-ember/90";
+  "rounded-md bg-flame px-7 font-semibold tracking-[0.01em] text-background shadow-flame hover:-translate-y-0.5 hover:bg-flame/90";
 const SECONDARY_CTA_CLASS =
-  "rounded-lg border-border/70 bg-surface/50 px-7 font-semibold tracking-[0.01em] backdrop-blur hover:-translate-y-0.5 hover:border-ember/50 hover:bg-surface-elevated hover:text-foreground";
+  "rounded-md border-border/70 bg-background/40 px-7 font-semibold tracking-[0.01em] backdrop-blur hover:-translate-y-0.5 hover:border-flame/50 hover:bg-surface-elevated hover:text-foreground";
+
+type BookingMode = "session" | "consult";
+
+type SlotSelection = {
+  day: string;
+  time: string;
+  mode: BookingMode;
+};
+
+const GOAL_OPTIONS = [
+  { value: "fat-loss", label: "Fat loss & body transformation" },
+  { value: "strength", label: "Strength & muscle" },
+  { value: "boxing", label: "Boxing & conditioning" },
+  { value: "injury", label: "Injury-smart training" },
+  { value: "assessment", label: "First session assessment" },
+] as const;
+
+const HERO_AVAILABILITY_TEASER = [
+  { day: "Mon", time: "7:00 AM" },
+  { day: "Tue", time: "5:30 PM" },
+  { day: "Wed", time: "9:30 AM" },
+] as const;
 
 function isHomePath(pathname: string) {
   return pathname === "/" || pathname === "";
@@ -159,12 +173,10 @@ function useAppRoute() {
 function NotFoundPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
-      <motion.div className="pointer-events-none absolute inset-0 grain opacity-90" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 grain opacity-90" aria-hidden />
       <div className="relative z-10 max-w-md text-center">
-        <p className="font-display text-xs font-medium uppercase tracking-[0.2em] text-ember">
-          Alex Carter
-        </p>
-        <h1 className="font-display text-7xl font-semibold tracking-tight text-ember">404</h1>
+        <img src={markImg} alt="" className="mx-auto h-14 w-auto" />
+        <h1 className="mt-6 font-display text-6xl font-semibold tracking-tight text-flame">404</h1>
         <h2 className="mt-2 font-display text-xl font-semibold tracking-tight text-foreground">
           Page not found
         </h2>
@@ -174,7 +186,7 @@ function NotFoundPage() {
         <div className="mt-8">
           <a
             href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-ember px-6 py-2.5 text-sm font-semibold tracking-[0.01em] text-background shadow-ember transition-all hover:-translate-y-0.5 hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-flame px-6 py-2.5 text-sm font-semibold tracking-[0.01em] text-background shadow-flame transition-all hover:-translate-y-0.5 hover:bg-flame/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             Go home
           </a>
@@ -203,32 +215,55 @@ export default function App() {
 }
 
 function LandingPage() {
+  const [bookingMode, setBookingMode] = useState<BookingMode>("session");
+  const [selection, setSelection] = useState<SlotSelection | null>(null);
+  const [preferredGoal, setPreferredGoal] = useState("");
+
+  const goBook = (mode: BookingMode, goal?: string) => {
+    setBookingMode(mode);
+    if (goal) setPreferredGoal(goal);
+    setSelection(null);
+    document.getElementById("appointments")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <main className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <main className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <a
         href="#top"
         className="absolute -top-14 left-1/2 z-[100] -translate-x-1/2 rounded-md bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 focus:top-0 focus:translate-y-4 focus:outline-none focus-visible:shadow-lg focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
       >
         Skip to main content
       </a>
-      <Nav />
-      <Hero />
-      <StickyMobileBookingCta />
-      <SocialProof />
-      <Services />
-      <WhyAlex />
-      <Schedule />
-      <Trust />
-      <Logistics />
-      <Booking />
+      <Nav onBook={goBook} />
+      <Hero onBook={goBook} />
+      <StickyMobileBookingCta
+        onBook={() => goBook("session")}
+        selection={selection}
+        onContinue={() => {
+          document.getElementById("booking-panel")?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
+      <WhyTrainHere onBook={goBook} />
+      <Programs onBook={goBook} />
+      <Testimonials />
+      <BookingProcess onBook={goBook} />
+      <AvailableAppointments
+        mode={bookingMode}
+        onModeChange={setBookingMode}
+        selection={selection}
+        onSelect={setSelection}
+        preferredGoal={preferredGoal}
+        onPreferredGoalChange={setPreferredGoal}
+      />
       <FAQSection />
+      <FinalCta onBook={goBook} />
       <Footer />
     </main>
   );
 }
 
 /* ---------------- Nav ---------------- */
-function Nav() {
+function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -263,12 +298,11 @@ function Nav() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
-          ? "border-b border-border/50 bg-background/75 py-2 backdrop-blur-xl"
+          ? "border-b border-border/50 bg-background/80 py-2 backdrop-blur-xl"
           : "bg-transparent py-4",
       )}
     >
-      <motion.div
-        layout
+      <div
         className={cn(
           "mx-auto flex h-14 max-w-[84rem] items-center gap-4 px-5 md:px-8 lg:px-10",
           scrolled && "md:h-[3.25rem]",
@@ -276,14 +310,15 @@ function Nav() {
       >
         <a
           href="#top"
-          className="group flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="group flex shrink-0 items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <span className="grid size-9 place-items-center rounded-lg bg-gradient-to-br from-ember to-ember-glow shadow-ember">
-            <Flame className="size-4 text-background" strokeWidth={2.5} />
-          </span>
-          <span className="font-display text-[0.95rem] font-semibold tracking-tight sm:text-lg">
-            ALEX<span className="text-ember">.</span>CARTER
-          </span>
+          <img
+            src={logoImg}
+            alt="Incinerate Elite Personal Training"
+            className="h-7 w-auto sm:h-8"
+            width={401}
+            height={68}
+          />
         </a>
 
         <nav
@@ -301,19 +336,25 @@ function Nav() {
           ))}
         </nav>
 
-        <motion.div className="ml-auto hidden items-center gap-3 md:flex">
+        <div className="ml-auto hidden items-center gap-3 md:flex">
           <Button asChild className={cn("h-10 px-5", PRIMARY_CTA_CLASS)}>
-            <a href="#booking">
-              Book Session
+            <a
+              href="#appointments"
+              onClick={(e) => {
+                e.preventDefault();
+                onBook("session");
+              }}
+            >
+              Book Your First Session
               <ArrowRight className="size-4" />
             </a>
           </Button>
-        </motion.div>
+        </div>
 
         <button
           ref={menuButtonRef}
           type="button"
-          className="grid size-10 place-items-center rounded-md border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:hidden"
+          className="ml-auto grid size-10 place-items-center rounded-md border border-border/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:ml-0 md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
@@ -321,30 +362,37 @@ function Nav() {
         >
           {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
         </button>
-      </motion.div>
+      </div>
 
       {open && (
         <div
           id={MOBILE_NAV_PANEL_ID}
           role="navigation"
           aria-label="Mobile site navigation"
-          className="md:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl"
+          className="border-t border-border/60 bg-background/95 backdrop-blur-xl md:hidden"
         >
-          <div className="px-5 py-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-3 px-5 py-4">
             {NAV.map((n, i) => (
               <a
                 key={n.href}
                 ref={i === 0 ? mobileNavFirstLinkRef : undefined}
                 href={n.href}
                 onClick={() => setOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground py-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="rounded-md py-2 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {n.label}
               </a>
             ))}
             <Button asChild className={cn("w-full", PRIMARY_CTA_CLASS)}>
-              <a href="#booking" onClick={() => setOpen(false)}>
-                Book Session
+              <a
+                href="#appointments"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(false);
+                  onBook("session");
+                }}
+              >
+                Book Your First Session
               </a>
             </Button>
           </div>
@@ -355,119 +403,141 @@ function Nav() {
 }
 
 /* ---------------- Hero ---------------- */
-const HERO_STATS = [
-  { k: "100+", v: "Sessions delivered" },
-  { k: "12+", v: "Nationalities coached" },
-  { k: "1:1", v: "Personalized plans" },
-] as const;
-
-function Hero() {
+function Hero({ onBook }: { onBook: (mode: BookingMode) => void }) {
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, 60]);
-  const opacity = useTransform(scrollY, [0, 400], [1, 0.6]);
+  const y = useTransform(scrollY, [0, 600], [0, 70]);
+  const opacity = useTransform(scrollY, [0, 500], [1, 0.55]);
 
   const heroTextProps = reduceMotion
     ? { initial: false as const }
     : {
-        initial: { opacity: 0, y: 32 },
+        initial: { opacity: 0, y: 28 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
+        transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const },
       };
 
   const background = (
     <>
-      <motion.div className="absolute inset-0 bg-background" />
-      <motion.div className="hero-glow-top absolute inset-0" aria-hidden />
-      <motion.div
-        className="pointer-events-none absolute left-1/2 top-[54%] h-[min(58vh,540px)] w-[min(72vw,400px)] -translate-x-1/2 -translate-y-1/2"
-        aria-hidden
-      >
-        <img
-          src={coachImg}
-          alt=""
-          width={800}
-          height={1000}
-          decoding="async"
-          fetchPriority="high"
-          className="hero-coach-ambient size-full object-cover object-[center_20%] opacity-[0.28] saturate-[0.9] contrast-[1.05]"
-        />
-      </motion.div>
-      <motion.div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-full bg-ember/15 blur-[100px]"
-        aria-hidden
+      <img
+        src={rogerCoachImg}
+        alt=""
+        width={1024}
+        height={1536}
+        decoding="async"
+        fetchPriority="high"
+        className="absolute inset-0 size-full object-cover object-[center_22%] scale-[1.02]"
       />
-      <motion.div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
-      <motion.div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_42%,transparent_20%,var(--background)_88%)]" />
-      <motion.div className="hero-grid absolute inset-0" aria-hidden />
-      <motion.div className="grain absolute inset-0" aria-hidden />
+      {/* Keep Roger faintly visible in the center; vignette the sides */}
+      <div className="absolute inset-0 bg-background/45" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_42%,transparent_0%,color-mix(in_oklab,var(--background)_55%,transparent)_55%,var(--background)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-transparent to-background" />
+      <div className="absolute inset-y-0 left-0 w-[18%] bg-gradient-to-r from-background to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-[18%] bg-gradient-to-l from-background to-transparent" />
+      <div className="grain absolute inset-0" aria-hidden />
     </>
   );
 
   return (
     <section
       id="top"
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 pt-28 pb-16 text-center md:px-8 md:pt-32 md:pb-20"
+      className="hero-section relative min-h-[100svh] overflow-hidden px-5 pb-16 pt-28 md:px-8 md:pb-20 md:pt-32"
     >
       {reduceMotion ? (
-        <div className="absolute inset-0 -z-10">{background}</div>
+        <div className="absolute inset-0 -z-10" aria-hidden>
+          {background}
+        </div>
       ) : (
-        <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10">
+        <motion.div style={{ y, opacity }} className="absolute inset-0 -z-10" aria-hidden>
           {background}
         </motion.div>
       )}
 
       <motion.div
         {...heroTextProps}
-        className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center"
+        className="hero-content relative z-10"
+        style={{
+          width: "100%",
+          maxWidth: 950,
+          marginLeft: "auto",
+          marginRight: "auto",
+          textAlign: "center",
+        }}
       >
-        <h1 className="font-display text-[clamp(2.85rem,7vw,5.25rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-balance">
-          <span className="block text-foreground">Structured Training.</span>
-          <span className="hero-headline-accent mt-3 block">Real Results.</span>
-        </h1>
-
-        <p className="mx-auto mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg md:leading-[1.75]">
-          Private indoor and outdoor coaching for expats and busy professionals in Los Angeles.
-          Built around your schedule, your goals, and the way you actually live.
+        <p className="font-display text-[0.7rem] font-medium uppercase tracking-[0.28em] text-flame sm:text-xs">
+          Incinerate Elite Personal Training · San Diego
         </p>
-
-        <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
-          <Button asChild size="lg" className={cn("h-12", PRIMARY_CTA_CLASS)}>
-            <a href="#booking">
-              Book Your Session
-              <ArrowRight className="size-4" />
-            </a>
+        <h1 className="mt-5 font-display text-[clamp(2.75rem,7.5vw,5.25rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-balance">
+          <span className="block text-foreground">Keep Your Body</span>
+          <span className="hero-headline-accent block">Burning.</span>
+        </h1>
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
+          One-on-one coaching with Roger Rojas in a private Kearny Mesa gym. Choose a time and
+          reserve your first session in under a minute.
+        </p>
+        <div className="hero-ctas mt-10">
+          <Button
+            size="lg"
+            className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
+            onClick={() => onBook("session")}
+          >
+            Book Your First Session
+            <ArrowRight className="size-4" />
           </Button>
-          <Button asChild size="lg" variant="outline" className={cn("h-12", SECONDARY_CTA_CLASS)}>
-            <a href="#booking-consult">Free Consultation</a>
+          <Button
+            size="lg"
+            variant="outline"
+            className={cn("h-12 w-full sm:w-auto", SECONDARY_CTA_CLASS)}
+            onClick={() => onBook("consult")}
+          >
+            Book Your Free Consultation
           </Button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => onBook("session")}
+          className="mt-8 flex w-full max-w-lg flex-col items-center justify-center gap-2 rounded-md border border-border/50 bg-background/35 px-4 py-3 text-center backdrop-blur-sm transition-colors hover:border-flame/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:gap-3"
+        >
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-flame">
+            Available this week
+          </span>
+          <span className="hidden h-3 w-px bg-border sm:block" aria-hidden />
+          <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
+            {HERO_AVAILABILITY_TEASER.map((slot, i) => (
+              <span key={`${slot.day}-${slot.time}`} className="inline-flex items-center gap-3">
+                {i > 0 && (
+                  <span className="hidden text-border sm:inline" aria-hidden>
+                    ·
+                  </span>
+                )}
+                <span>
+                  <span className="font-medium text-foreground">{slot.day}</span> {slot.time}
+                </span>
+              </span>
+            ))}
+          </span>
+        </button>
 
         <p className="mt-5 max-w-md text-xs leading-relaxed text-muted-foreground sm:text-sm">
-          Request your preferred day and time — Alex confirms personally within 24 hours.
+          No phone tag. No waiting days for a reply. Roger confirms every booking personally.
         </p>
-
-        <div className="mt-12 flex w-full max-w-2xl flex-wrap items-center justify-center gap-x-8 gap-y-4 border-t border-border/50 pt-10">
-          {HERO_STATS.map((s) => (
-            <div key={s.k} className="min-w-[5.5rem] text-center">
-              <div className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-                {s.k}
-              </div>
-              <div className="mt-1 text-[11px] leading-snug text-muted-foreground sm:text-xs">
-                {s.v}
-              </div>
-            </div>
-          ))}
-        </div>
       </motion.div>
     </section>
   );
 }
 
-const STICKY_BOOKING_DISMISS_KEY = "lab-sticky-booking-dismiss";
+const STICKY_BOOKING_DISMISS_KEY = "incinerate-sticky-booking-dismiss";
 
-/** Compact mobile-only CTA after the hero; hides near #booking or when dismissed. */
-function StickyMobileBookingCta() {
+function StickyMobileBookingCta({
+  onBook,
+  selection,
+  onContinue,
+}: {
+  onBook: () => void;
+  selection: SlotSelection | null;
+  onContinue: () => void;
+}) {
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
     try {
@@ -477,11 +547,13 @@ function StickyMobileBookingCta() {
     }
   });
   const [visible, setVisible] = useState(false);
+  const [panelOnScreen, setPanelOnScreen] = useState(false);
 
   useEffect(() => {
     const update = () => {
       const hero = document.getElementById("top");
-      const booking = document.getElementById("booking");
+      const booking = document.getElementById("appointments");
+      const panel = document.getElementById("booking-panel");
       const vh = window.innerHeight;
       let pastHero = false;
       if (hero) {
@@ -494,7 +566,14 @@ function StickyMobileBookingCta() {
         const br = booking.getBoundingClientRect();
         bookingOnScreen = br.top < vh * 0.88 && br.bottom > vh * 0.12;
       }
-      setVisible(pastHero && !bookingOnScreen);
+      let panelVisible = false;
+      if (panel) {
+        const pr = panel.getBoundingClientRect();
+        panelVisible = pr.top < vh * 0.75 && pr.bottom > vh * 0.2;
+      }
+      setPanelOnScreen(panelVisible);
+      // Show when past hero; if a slot is selected, stay visible until the form panel is on screen
+      setVisible(pastHero && (selection ? !panelVisible : !bookingOnScreen));
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -503,49 +582,64 @@ function StickyMobileBookingCta() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [selection]);
 
   const dismiss = () => {
     try {
       sessionStorage.setItem(STICKY_BOOKING_DISMISS_KEY, "1");
     } catch {
-      /* ignore quota / private mode */
+      /* ignore */
     }
     setDismissed(true);
   };
 
   if (dismissed) return null;
 
+  const hasSelection = !!selection;
+
   return (
     <div
       className={cn(
-        "md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 transition-[opacity,transform] duration-300 ease-out",
+        "fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 transition-[opacity,transform] duration-300 ease-out md:hidden",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
       )}
       aria-hidden={!visible}
     >
-      <div className="mx-auto max-w-lg flex items-stretch gap-2 rounded-2xl border border-border/70 bg-background/95 backdrop-blur-xl shadow-lg shadow-black/20 p-2 pl-3">
-        <a
-          href="#booking"
-          className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-ember px-4 py-3 text-sm font-semibold tracking-[0.01em] text-background shadow-ember transition-all hover:-translate-y-0.5 hover:bg-ember/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        >
-          Book session
-          <ArrowRight className="size-4 shrink-0" aria-hidden />
-        </a>
+      <div className="mx-auto flex max-w-lg items-stretch gap-2 rounded-2xl border border-border/70 bg-background/95 p-2 pl-3 shadow-lg shadow-black/30 backdrop-blur-xl">
         <button
           type="button"
-          onClick={dismiss}
-          className="shrink-0 grid place-items-center size-11 rounded-lg border border-border/60 text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          aria-label="Dismiss booking shortcut"
+          onClick={hasSelection ? onContinue : onBook}
+          className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-flame px-4 py-3 text-sm font-semibold tracking-[0.01em] text-background shadow-flame transition-all hover:-translate-y-0.5 hover:bg-flame/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <X className="size-5" aria-hidden />
+          {hasSelection ? (
+            <span className="truncate">
+              Selected: {selection.day.slice(0, 3)} {selection.time}
+            </span>
+          ) : (
+            <span>Book Your First Session</span>
+          )}
+          <ArrowRight className="size-4 shrink-0" aria-hidden />
         </button>
+        {!hasSelection && (
+          <button
+            type="button"
+            onClick={dismiss}
+            className="grid size-11 shrink-0 place-items-center rounded-lg border border-border/60 text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label="Dismiss booking shortcut"
+          >
+            <X className="size-5" aria-hidden />
+          </button>
+        )}
       </div>
+      {hasSelection && !panelOnScreen && (
+        <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
+          Tap to finish reserving
+        </p>
+      )}
     </div>
   );
 }
 
-/* ---------------- Reveal helper ---------------- */
 function Reveal({
   children,
   delay = 0,
@@ -572,78 +666,274 @@ function Reveal({
   );
 }
 
-/* ---------------- Social Proof ---------------- */
-function SocialProof() {
-  const testimonials = [
+/* ---------------- Why Train Here ---------------- */
+function WhyTrainHere({ onBook }: { onBook: (mode: BookingMode) => void }) {
+  const credentials = [
+    "18+ years of elite coaching",
+    "United States Marine veteran",
+    "Master personal trainer",
+    "Private gym owner · Kearny Mesa",
+  ];
+
+  const points = [
     {
-      img: t1,
-      name: "Jordan M.",
-      role: "Tech founder · UK",
-      quote:
-        "Lost 9kg and finally feel athletic again. Alex's structure made it impossible to drift.",
+      icon: Users,
+      title: "One-on-one, not one-of-many",
+      desc: "Every session is built around your body, schedule, goals, and training history.",
     },
     {
-      img: t2,
-      name: "Camille L.",
-      role: "Marketing lead · France",
-      quote: "Sessions fit around insane meeting weeks. I show up, I leave stronger. That simple.",
+      icon: Target,
+      title: "Personalized results",
+      desc: "Fat loss, strength, boxing, posture, or academy prep — programmed for you, not a template.",
     },
     {
-      img: t3,
-      name: "Daniel R.",
-      role: "Investor · Brazil",
-      quote: "The most professional trainer I've worked with in any city. Worth every minute.",
+      icon: ShieldCheck,
+      title: "A private San Diego gym",
+      desc: "Train in a focused facility with sauna, cold plunge, boxing, and outdoor space — no crowded floors.",
     },
   ];
+
   return (
-    <section className="relative overflow-hidden py-24 md:py-32">
+    <section id="why" className="relative overflow-hidden py-24 md:py-32">
       <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
-            <div>
-              <h2 className="font-display text-4xl md:text-5xl font-semibold max-w-xl text-balance">
-                Coaching that delivers, season after season.
-              </h2>
+      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <Reveal>
+            <div className="relative aspect-[4/5] overflow-hidden rounded-sm md:aspect-[5/6]">
+              <img
+                src={trainingImg}
+                alt="Roger Rojas coaching a client at Incinerate Fitness"
+                width={683}
+                height={1024}
+                loading="lazy"
+                className="size-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+                <p className="font-display text-sm font-medium uppercase tracking-[0.2em] text-flame">
+                  Roger Rojas
+                </p>
+                <p className="mt-1 text-sm text-foreground/90">
+                  Founder · Incinerate Elite Personal Training
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground max-w-sm">
-              From founders to creatives, clients keep training with Alex because the system works.
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <div>
+              <h2 className="font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+                Train directly with Roger Rojas.
+              </h2>
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
+                An experienced private coach who builds every program around your body, schedule,
+                goals, and training history.
+              </p>
+
+              <ul className="mt-7 flex flex-wrap gap-2">
+                {credentials.map((c) => (
+                  <li
+                    key={c}
+                    className="rounded-md border border-border/70 bg-surface/80 px-3 py-1.5 text-xs font-medium text-muted-foreground"
+                  >
+                    {c}
+                  </li>
+                ))}
+              </ul>
+
+              <ul className="mt-10 space-y-7">
+                {points.map((p) => (
+                  <li key={p.title} className="flex gap-4">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-md border border-flame/30 bg-flame/10">
+                      <p.icon className="size-5 text-flame" />
+                    </div>
+                    <div>
+                      <h3 className="font-display text-lg font-semibold tracking-tight">
+                        {p.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        {p.desc}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                size="lg"
+                className={cn("mt-10 h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
+                onClick={() => onBook("session")}
+              >
+                Book Your First Session
+                <ArrowRight className="size-4" />
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Programs ---------------- */
+function Programs({ onBook }: { onBook: (mode: BookingMode, goal?: string) => void }) {
+  const programs = [
+    {
+      img: coachImg,
+      title: "Fat Loss & Body Transformation",
+      desc: "Structured training and nutrition guidance to burn fat, tone up, and reshape your body with accountability.",
+      detail: "Private sessions · packages available",
+      goal: "fat-loss",
+    },
+    {
+      img: trainingImg,
+      title: "Strength & Muscle Building",
+      desc: "Progressive strength work and bodybuilding-style programming tailored to your level and recovery.",
+      detail: "1-on-1 · 60 min sessions",
+      goal: "strength",
+    },
+    {
+      img: boxingImg,
+      title: "Boxing & Conditioning",
+      desc: "Boxing, HIIT, and athletic conditioning in a private gym — built for power, endurance, and confidence.",
+      detail: "Boxing area · agility training",
+      goal: "boxing",
+    },
+    {
+      img: gym3,
+      title: "First Session Assessment",
+      desc: "Start with an assessment and coaching that meets you where you are — including injury-smart modifications when needed.",
+      detail: "Starter package from $500",
+      goal: "assessment",
+    },
+  ];
+
+  return (
+    <section id="programs" className="relative overflow-hidden bg-surface/40 py-24 md:py-32">
+      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
+      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
+        <Reveal>
+          <div className="mb-14 max-w-2xl">
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+              What do you want to achieve?
+            </h2>
+            <p className="mt-5 text-muted-foreground">
+              Pick the goal that fits you. Every path starts the same way — reserve a time with
+              Roger.
             </p>
           </div>
         </Reveal>
 
-        <Reveal>
-          <div className="overflow-hidden rounded-2xl border border-border/70 bg-background md:grid md:grid-cols-3 md:divide-x md:divide-border/70 max-md:divide-y max-md:divide-border/70">
-            {testimonials.map((t) => (
-              <article
-                key={t.name}
-                className="group relative min-h-[28rem] overflow-hidden md:min-h-[32rem]"
-              >
+        <div className="grid gap-5 md:grid-cols-2">
+          {programs.map((p, i) => (
+            <Reveal key={p.title} delay={i * 0.06}>
+              <article className="group relative flex min-h-[22rem] flex-col justify-end overflow-hidden rounded-sm border border-border/50 md:min-h-[26rem]">
                 <img
-                  src={t.img}
-                  alt={t.name}
+                  src={p.img}
+                  alt=""
                   width={900}
                   height={1100}
                   loading="lazy"
                   className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/92 via-background/45 to-background/10" />
-                <div className="absolute inset-x-0 bottom-0 p-7 md:p-8">
-                  <p className="max-w-sm font-display text-2xl font-semibold leading-tight tracking-tight text-foreground text-balance">
-                    &ldquo;{t.quote}&rdquo;
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-background/15" />
+                <div className="relative z-10 p-7 md:p-8">
+                  <p className="text-xs uppercase tracking-[0.2em] text-flame">{p.detail}</p>
+                  <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight md:text-3xl">
+                    {p.title}
+                  </h3>
+                  <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                    {p.desc}
                   </p>
-                  <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/18 pt-5">
-                    <div>
-                      <div className="text-sm font-semibold">{t.name}</div>
-                      <div className="mt-1 text-xs text-foreground/70">{t.role}</div>
-                    </div>
-                    <div
-                      className="text-sm tracking-[0.18em] text-ember"
-                      aria-label="5 star rating"
-                    >
-                      ★★★★★
-                    </div>
+                  <Button
+                    variant="outline"
+                    className="mt-6 w-full border-border/80 bg-transparent hover:border-flame hover:bg-flame hover:text-background sm:w-auto"
+                    onClick={() => onBook("session", p.goal)}
+                  >
+                    Reserve Your Spot
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Testimonials ---------------- */
+function Testimonials() {
+  const testimonials = [
+    {
+      quote:
+        "Roger completely tailored a plan that included fitness and nutrition. There is no reason you can't achieve your fitness goals — even at my age.",
+      name: "Kevin",
+      fullName: "Kevin Jay McCalley",
+      outcome: "Down weight · stronger knees · accountable",
+      initials: "KJ",
+    },
+    {
+      quote:
+        "It's been four months and I'm down roughly 14lbs, and have not experienced any back pain since working with him.",
+      name: "Vanessa",
+      fullName: "Vanessa",
+      outcome: "14 lbs down · back pain gone",
+      initials: "V",
+    },
+    {
+      quote:
+        "Roger is charismatic, fun, personable, and highly skilled. He makes working out enjoyable — and he goes above and beyond for his clients.",
+      name: "Gabrielle",
+      fullName: "Gabrielle",
+      outcome: "Beginner → confident & consistent",
+      initials: "G",
+    },
+  ];
+
+  return (
+    <section id="results" className="relative overflow-hidden py-24 md:py-32">
+      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
+        <Reveal>
+          <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <h2 className="max-w-xl font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+              Real clients. Real San Diego results.
+            </h2>
+            <p className="max-w-sm text-muted-foreground">
+              From athletes to beginners — people stay because the coaching works and the gym feels
+              like theirs.
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+            {testimonials.map((t) => (
+              <article
+                key={t.fullName}
+                className="flex flex-col rounded-sm border border-border/60 bg-surface/40 p-6 md:p-7"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="grid size-11 place-items-center rounded-full border border-flame/30 bg-flame/15 font-display text-sm font-semibold text-flame"
+                    aria-hidden
+                  >
+                    {t.initials}
                   </div>
+                  <div className="text-xs tracking-[0.18em] text-flame" aria-label="5 star rating">
+                    ★★★★★
+                  </div>
+                </div>
+                <p className="mt-5 text-xs font-medium uppercase tracking-[0.16em] text-flame">
+                  {t.outcome}
+                </p>
+                <p className="mt-3 flex-1 text-base leading-relaxed text-foreground/90 text-pretty">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div className="mt-6 border-t border-border/60 pt-4">
+                  <div className="text-sm font-semibold">{t.name}</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">Incinerate client</div>
                 </div>
               </article>
             ))}
@@ -654,488 +944,66 @@ function SocialProof() {
   );
 }
 
-/* ---------------- Services ---------------- */
-function Services() {
-  const services = [
+/* ---------------- Simple Booking Process ---------------- */
+function BookingProcess({ onBook }: { onBook: (mode: BookingMode) => void }) {
+  const steps = [
     {
-      img: indoorImg,
-      icon: Dumbbell,
-      title: "Indoor Personal Training",
-      desc: "Private 1-on-1 strength sessions inside well-equipped LA gyms or your building.",
-      benefits: ["Strength & hypertrophy", "Fat loss programming", "Form-perfect coaching"],
+      n: "01",
+      title: "Pick a time",
+      desc: "Browse open slots this week and tap the one that fits your schedule.",
     },
     {
-      img: outdoorImg,
-      icon: Mountain,
-      title: "Outdoor Training Sessions",
-      desc: "Beach, park, or track sessions built around conditioning and athleticism.",
-      benefits: ["Athletic performance", "Conditioning blocks", "LA's best locations"],
+      n: "02",
+      title: "Reserve your spot",
+      desc: "Leave your name, contact, and goal. Takes under a minute.",
     },
     {
-      img: customImg,
-      icon: Sparkles,
-      title: "Custom Coaching Programs",
-      desc: "Fully personalized 4–12 week programs with weekly check-ins and tracking.",
-      benefits: ["Bespoke programming", "Weekly accountability", "Lifestyle coaching"],
+      n: "03",
+      title: "Show up and train",
+      desc: "Roger confirms, you walk into the private gym, and the work begins.",
     },
   ];
 
   return (
-    <section id="services" className="relative overflow-hidden bg-surface/30 py-24 md:py-32">
+    <section id="process" className="relative overflow-hidden bg-surface/40 py-24 md:py-32">
       <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
         <Reveal>
-          <div className="max-w-2xl mb-14">
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
-              Three ways to train. One standard of work.
+          <div className="mb-14 max-w-2xl">
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+              Booking takes minutes, not days.
             </h2>
-          </div>
-        </Reveal>
-
-        <div className="grid md:grid-cols-3 gap-5">
-          {services.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.08}>
-              <div className="group relative h-full rounded-3xl overflow-hidden border border-border/60 bg-surface hover:border-ember/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-ember">
-                <div className="relative aspect-[5/4] overflow-hidden">
-                  <img
-                    src={s.img}
-                    alt={s.title}
-                    width={1024}
-                    height={820}
-                    loading="lazy"
-                    className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/30 to-transparent" />
-                  <div className="absolute top-5 left-5 size-11 rounded-xl glass-strong border border-border/60 grid place-items-center">
-                    <s.icon className="size-5 text-ember" />
-                  </div>
-                </div>
-                <div className="p-7">
-                  <h3 className="font-display text-2xl font-semibold tracking-tight">{s.title}</h3>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-                  <ul className="mt-5 space-y-2">
-                    {s.benefits.map((b) => (
-                      <li key={b} className="flex items-center gap-2 text-sm">
-                        <CheckCircle2 className="size-4 text-ember shrink-0" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="mt-7 w-full border-border/80 bg-transparent hover:border-ember hover:bg-ember hover:text-background"
-                  >
-                    <a href="#booking">
-                      Book this session
-                      <ArrowRight className="size-4" />
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Why Alex ---------------- */
-function WhyAlex() {
-  const items = [
-    {
-      icon: Target,
-      title: "Structured approach",
-      desc: "Every session and week tied to a measurable goal.",
-      img: coachImg,
-    },
-    {
-      icon: Timer,
-      title: "Efficient sessions",
-      desc: "45–75 min training designed around your calendar.",
-      img: heroImg,
-    },
-    {
-      icon: ShieldCheck,
-      title: "Real accountability",
-      desc: "Weekly check-ins. No drift. No excuses.",
-      img: undefined,
-    },
-    {
-      icon: MapPin,
-      title: "Flexible locations",
-      desc: "Indoor, outdoor, your gym — wherever you train best.",
-      img: outdoorImg,
-    },
-    {
-      icon: Globe2,
-      title: "Built for expats",
-      desc: "International communication, no local-jargon coaching.",
-      img: undefined,
-    },
-    {
-      icon: LineChart,
-      title: "Progression tracking",
-      desc: "Numbers, photos, and lifts — measured every block.",
-      img: customImg,
-    },
-  ];
-  return (
-    <section id="why" className="py-24 md:py-32 relative">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <div className="max-w-2xl mb-14">
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
-              What&apos;s it like training with Alex?
-            </h2>
-            <p className="mt-5 max-w-xl text-muted-foreground">
-              Clear sessions, honest feedback, and a plan that fits your week. You will know what
-              you are doing, why it matters, and how progress is being measured.
+            <p className="mt-5 text-muted-foreground">
+              Choose a time below and start this week — no generic contact form required.
             </p>
           </div>
         </Reveal>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/60 rounded-3xl overflow-hidden border border-border/60">
-          {items.map((it, i) => (
-            <Reveal key={it.title} delay={i * 0.04}>
-              <div className="group relative overflow-hidden bg-background p-8 h-full transition-colors hover:bg-surface">
-                {it.img && (
-                  <>
-                    <img
-                      src={it.img}
-                      alt=""
-                      width={900}
-                      height={700}
-                      loading="lazy"
-                      className="absolute inset-0 size-full object-cover opacity-[0.16] grayscale transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.22] group-hover:grayscale-0"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-background via-background/88 to-background/55" />
-                  </>
-                )}
-                <div className="relative z-10">
-                  <div className="size-11 rounded-xl bg-surface border border-border grid place-items-center group-hover:bg-ember/10 group-hover:border-ember/40 transition-colors">
-                    <it.icon className="size-5 text-ember" />
-                  </div>
-                  <h3 className="font-display text-xl font-semibold mt-5">{it.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{it.desc}</p>
+        <div className="grid gap-8 md:grid-cols-3 md:gap-6">
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.07}>
+              <div className="relative h-full border-t border-flame/40 pt-6">
+                <div className="font-display text-sm font-medium tracking-[0.2em] text-flame">
+                  {s.n}
                 </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Schedule ---------------- */
-function Schedule() {
-  const classes = [
-    {
-      img: indoorImg,
-      icon: Dumbbell,
-      title: "1-on-1 Indoor Session",
-      desc: "Private strength & physique work, programmed week to week.",
-      duration: "60 min",
-      location: "Private / Partner Gym",
-      intensity: "Moderate–High",
-      price: "From $140",
-      slots: ["7:00 AM", "12:30 PM", "6:30 PM"],
-    },
-    {
-      img: outdoorImg,
-      icon: Mountain,
-      title: "Outdoor Strength Session",
-      desc: "Sled, kettlebells, sprints — built for athleticism and conditioning.",
-      duration: "60 min",
-      location: "Park / Beach / Track",
-      intensity: "High",
-      price: "From $130",
-      slots: ["6:30 AM", "5:30 PM", "7:00 PM"],
-    },
-    {
-      img: t2,
-      icon: Users,
-      title: "Small Group Class",
-      desc: "Train with 2–4 people at a similar level. Same coaching, lower price.",
-      duration: "60 min",
-      location: "Outdoor · Santa Monica",
-      intensity: "Moderate",
-      price: "From $65",
-      slots: ["7:30 AM", "8:30 AM", "5:30 PM"],
-    },
-    {
-      img: customImg,
-      icon: Zap,
-      title: "Mobility & Conditioning",
-      desc: "Recovery, mobility, and metabolic work to keep your body resilient.",
-      duration: "45 min",
-      location: "Indoor / Outdoor",
-      intensity: "Low–Moderate",
-      price: "From $110",
-      slots: ["12:00 PM", "1:30 PM", "8:00 PM"],
-    },
-  ];
-
-  return (
-    <section id="schedule" className="relative overflow-hidden bg-surface/30 py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0 grain" aria-hidden />
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
-            <div>
-              <h2 className="font-display text-4xl md:text-5xl font-semibold max-w-xl text-balance">
-                Session types and example time windows.
-              </h2>
-            </div>
-            <p className="text-muted-foreground max-w-sm">
-              Times shown are typical options; Alex confirms real availability when you book.
-            </p>
-          </div>
-        </Reveal>
-
-        <div className="grid md:grid-cols-2 gap-5">
-          {classes.map((c, i) => (
-            <Reveal key={c.title} delay={i * 0.05}>
-              <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-background hover:border-ember/40 hover:shadow-ember p-7 md:p-8 h-full transition-all">
-                <img
-                  src={c.img}
-                  alt=""
-                  width={900}
-                  height={700}
-                  loading="lazy"
-                  className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-1/2 object-cover opacity-[0.14] saturate-[0.85] transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.2] sm:block"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/92 to-background/35" />
-                <div className="relative z-10 flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="size-12 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
-                      <c.icon className="size-5 text-ember" />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-xl md:text-2xl font-semibold leading-tight">
-                        {c.title}
-                      </h3>
-                      <div className="text-xs text-muted-foreground mt-1">{c.location}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-display text-lg font-semibold">{c.price}</div>
-                    <div className="text-xs text-muted-foreground">{c.duration}</div>
-                  </div>
-                </div>
-
-                <p className="relative z-10 mt-5 text-sm text-muted-foreground leading-relaxed">
-                  {c.desc}
-                </p>
-
-                <div className="relative z-10 mt-5 flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-md bg-surface border border-border px-3 py-1 text-muted-foreground">
-                    Intensity · {c.intensity}
-                  </span>
-                </div>
-
-                <div className="relative z-10 mt-6">
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                    Example time windows
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {c.slots.map((s) => (
-                      <span
-                        key={s}
-                        className="rounded-lg bg-surface-elevated border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <Button asChild className={cn("relative z-10 mt-7 h-11 w-full", PRIMARY_CTA_CLASS)}>
-                  <a href="#booking">
-                    Book This Session
-                    <ArrowRight className="size-4" />
-                  </a>
-                </Button>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Trust ---------------- */
-function Trust() {
-  const points = [
-    {
-      icon: ShieldCheck,
-      title: "Certified, structured coaching",
-      body: "Training is planned around your level, injury history, and measurable progression.",
-    },
-    {
-      icon: Users,
-      title: "Built for busy clients",
-      body: "Alex coaches expats, founders, and professionals who need training to fit real weeks.",
-    },
-    {
-      icon: Clock,
-      title: "Clear communication",
-      body: "You get direct feedback, simple next steps, and a personal response within 24 hours.",
-    },
-  ];
-
-  return (
-    <section className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr] md:items-end">
-            <div>
-              <h2 className="font-display text-4xl font-semibold text-balance md:text-5xl">
-                Why trust Alex?
-              </h2>
-              <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-                The work is simple on purpose: train consistently, move well, recover enough, and
-                keep your numbers honest. Alex brings the structure so you can focus on showing up.
-              </p>
-            </div>
-            <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-surface/50 p-6 md:p-7">
-              <img
-                src={coachImg}
-                alt=""
-                width={900}
-                height={700}
-                loading="lazy"
-                className="pointer-events-none absolute inset-y-0 right-0 h-full w-1/2 object-cover opacity-[0.18] saturate-[0.9]"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-surface via-surface/90 to-surface/50" />
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="grid size-12 place-items-center rounded-lg border border-ember/40 bg-ember/15">
-                  <ShieldCheck className="size-6 text-ember" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Alex Carter</div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    Certified Personal Trainer · Los Angeles
-                  </div>
-                </div>
-              </div>
-              <div className="relative z-10 mt-6 border-t border-border/60 pt-5 text-sm leading-relaxed text-muted-foreground">
-                Indoor, outdoor, and custom programs with direct accountability and a clear training
-                plan before every block begins.
-              </div>
-            </div>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.08}>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 md:grid-cols-3">
-            {points.map((p) => (
-              <div key={p.title} className="bg-background p-7 md:p-8">
-                <div className="grid size-10 place-items-center rounded-lg bg-ember/10">
-                  <p.icon className="size-5 text-ember" />
-                </div>
-                <h3 className="mt-5 font-display text-xl font-semibold">{p.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Logistics ---------------- */
-function Logistics() {
-  const cards = [
-    {
-      icon: Dumbbell,
-      title: "Indoor sessions",
-      body: "Private studio, partner gyms, or your building's gym — Alex brings the programming, you bring yourself.",
-      img: indoorImg,
-    },
-    {
-      icon: Mountain,
-      title: "Outdoor sessions",
-      body: "Parks, beaches, running tracks, or any agreed location across the city.",
-      img: outdoorImg,
-    },
-    {
-      icon: MapPin,
-      title: "Areas covered",
-      body: "West Hollywood · Beverly Hills · Santa Monica · Venice · Downtown LA",
-      img: heroImg,
-    },
-    {
-      icon: Clock,
-      title: "Session duration",
-      body: "Choose 45, 60, or 75 minutes — whatever fits your schedule and goal block.",
-      img: undefined,
-    },
-    {
-      icon: CheckCircle2,
-      title: "What to bring",
-      body: "Water, towel, training shoes. Equipment and programming handled by Alex.",
-      img: undefined,
-    },
-    {
-      icon: Calendar,
-      title: "Cancellation & payment",
-      body: "Flexible 24h cancellation policy. Card, transfer, or package billing — all supported.",
-      img: undefined,
-    },
-  ];
-
-  return (
-    <section id="logistics" className="py-24 md:py-32 relative bg-surface/30">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
-          <div className="max-w-2xl mb-14">
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
-              Everything practical, before you book.
-            </h2>
-          </div>
-        </Reveal>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map((c, i) => (
-            <Reveal key={c.title} delay={i * 0.04}>
-              <div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-background p-7 h-full hover:border-ember/40 transition-colors">
-                {c.img && (
-                  <>
-                    <img
-                      src={c.img}
-                      alt=""
-                      width={900}
-                      height={700}
-                      loading="lazy"
-                      className="pointer-events-none absolute inset-0 size-full object-cover opacity-[0.14] saturate-[0.9] transition-all duration-700 group-hover:scale-[1.03] group-hover:opacity-[0.2]"
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-background/90 to-background/58" />
-                  </>
-                )}
-                <div className="relative z-10">
-                  <div className="size-11 rounded-xl bg-ember/10 border border-ember/30 grid place-items-center">
-                    <c.icon className="size-5 text-ember" />
-                  </div>
-                  <h3 className="font-display text-lg font-semibold mt-5">{c.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{c.body}</p>
-                </div>
+                <h3 className="mt-4 font-display text-2xl font-semibold tracking-tight">
+                  {s.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
               </div>
             </Reveal>
           ))}
         </div>
 
         <Reveal>
-          <div className="mt-12 text-center">
-            <Button asChild size="lg" className={cn("h-12", PRIMARY_CTA_CLASS)}>
-              <a href="#booking">
-                Book Your First Session
-                <ArrowRight className="size-4" />
-              </a>
+          <div className="mt-14">
+            <Button
+              size="lg"
+              className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
+              onClick={() => onBook("session")}
+            >
+              Choose a Time
+              <ArrowRight className="size-4" />
             </Button>
           </div>
         </Reveal>
@@ -1144,229 +1012,343 @@ function Logistics() {
   );
 }
 
-/* ---------------- Booking ---------------- */
-const formSchema = z.object({
-  name: z.string().min(2, "Please enter your full name"),
-  email: z.string().email("Please enter a valid email"),
-  goal: z.string().min(1, "Pick a goal"),
-  type: z.string().min(1, "Pick a training type"),
-  message: z.string().optional(),
-  preferredDaySummary: z.string().min(1, "Pick a preferred day"),
-  preferredTimeSlot: z.string().min(1, "Pick a preferred time"),
-});
+/* ---------------- Available Appointments ---------------- */
+const WEEK_SCHEDULE = [
+  { day: "Monday", times: ["7:00 AM", "12:00 PM", "5:30 PM"] },
+  { day: "Tuesday", times: ["8:00 AM", "1:00 PM", "6:00 PM"] },
+  { day: "Wednesday", times: ["9:30 AM", "4:30 PM"] },
+  { day: "Thursday", times: ["7:00 AM", "5:00 PM"] },
+  { day: "Friday", times: ["8:00 AM", "12:00 PM", "4:30 PM"] },
+] as const;
+
+const formSchema = z
+  .object({
+    name: z.string().min(2, "Please enter your full name"),
+    contact: z.string().min(5, "Enter an email or phone number"),
+    goal: z.string().min(1, "Pick a primary goal"),
+  })
+  .superRefine((data, ctx) => {
+    const value = data.contact.trim();
+    const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    const looksLikePhone =
+      /^[\d\s()+.-]{7,}$/.test(value) && /\d{7,}/.test(value.replace(/\D/g, ""));
+    if (!looksLikeEmail && !looksLikePhone) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["contact"],
+        message: "Enter a valid email or phone number",
+      });
+    }
+  });
 type FormValues = z.infer<typeof formSchema>;
 
-function Booking() {
+function AvailableAppointments({
+  mode,
+  onModeChange,
+  selection,
+  onSelect,
+  preferredGoal,
+  onPreferredGoalChange,
+}: {
+  mode: BookingMode;
+  onModeChange: (m: BookingMode) => void;
+  selection: SlotSelection | null;
+  onSelect: (s: SlotSelection | null) => void;
+  preferredGoal: string;
+  onPreferredGoalChange: (goal: string) => void;
+}) {
   const [submitted, setSubmitted] = useState(false);
-  const [selectedDay, setSelectedDay] = useState(1);
-  const [selectedSlot, setSelectedSlot] = useState("7:00 AM");
-
-  const days = useMemo(() => {
-    const today = new Date();
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      return {
-        i,
-        weekday: d.toLocaleDateString("en-US", { weekday: "short" }),
-        day: d.getDate(),
-      };
-    });
-  }, []);
-
-  const initialPreferredDay = `${days[selectedDay]!.weekday} ${days[selectedDay]!.day}`;
+  const [submittedValues, setSubmittedValues] = useState<FormValues | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      goal: "",
-      type: "",
-      message: "",
-      preferredDaySummary: initialPreferredDay,
-      preferredTimeSlot: selectedSlot,
-    },
+    defaultValues: { name: "", contact: "", goal: preferredGoal || "" },
   });
 
   const { control, setValue } = form;
-  const slots = ["6:30 AM", "7:00 AM", "12:30 PM", "5:30 PM", "6:30 PM", "7:00 PM"];
+  const modeLabel = mode === "session" ? "First Session" : "Free Consultation";
 
   useEffect(() => {
-    const d = days[selectedDay];
-    if (!d) return;
-    setValue("preferredDaySummary", `${d.weekday} ${d.day}`, {
-      shouldValidate: true,
-    });
-    setValue("preferredTimeSlot", selectedSlot, { shouldValidate: true });
-  }, [selectedDay, selectedSlot, days, setValue]);
+    if (!preferredGoal) return;
+    setValue("goal", preferredGoal, { shouldValidate: true });
+  }, [preferredGoal, setValue]);
 
-  useEffect(() => {
-    if (submitted) return;
-    const focusMessageIfConsult = () => {
-      if (window.location.hash !== "#booking-consult") return;
-      const el = document.getElementById("message");
-      if (!(el instanceof HTMLTextAreaElement)) return;
-      queueMicrotask(() => {
-        el.focus({ preventScroll: false });
-      });
-    };
-    focusMessageIfConsult();
-    window.addEventListener("hashchange", focusMessageIfConsult);
-    return () => window.removeEventListener("hashchange", focusMessageIfConsult);
-  }, [submitted]);
-
-  const onSubmit = (values: FormValues) => {
-    setSubmitted(true);
-    toast.success("Request received", {
-      description: `Thanks ${values.name.split(" ")[0]} — Alex will confirm by email within 24 hours.`,
+  const pickSlot = (day: string, time: string) => {
+    onSelect({ day, time, mode });
+    setSubmitted(false);
+    setSubmittedValues(null);
+    queueMicrotask(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   };
 
+  const onSubmit = (values: FormValues) => {
+    if (!selection) return;
+    setSubmittedValues(values);
+    setSubmitted(true);
+    onPreferredGoalChange(values.goal);
+    toast.success("Session reserved", {
+      description: `${selection.day} at ${selection.time} · Roger will confirm personally.`,
+    });
+  };
+
+  const summary = useMemo(() => {
+    if (!selection) return null;
+    return `${selection.day} · ${selection.time}`;
+  }, [selection]);
+
+  const goalLabel = useMemo(() => {
+    const value = submittedValues?.goal || preferredGoal;
+    return GOAL_OPTIONS.find((g) => g.value === value)?.label;
+  }, [submittedValues, preferredGoal]);
+
   return (
-    <section id="booking" className="py-24 md:py-32 relative">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <section id="appointments" className="relative overflow-hidden py-24 md:py-32">
+      <div className="pointer-events-none absolute inset-0">
+        <img
+          src={facilityImg}
+          alt=""
+          width={1067}
+          height={1600}
+          loading="lazy"
+          className="absolute inset-0 size-full object-cover opacity-[0.12]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
         <Reveal>
-          <div className="max-w-2xl mb-14">
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
-              Send a request with your goals and preferred times.
+          <div className="mb-10 max-w-2xl">
+            <p className="text-xs font-medium uppercase tracking-[0.24em] text-flame">
+              Available this week
+            </p>
+            <h2 className="mt-4 font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+              Choose Your First Session
             </h2>
             <p className="mt-5 text-muted-foreground">
-              Alex confirms every booking personally — no instant holds or automated confirmation
-              emails.
+              Select an available time and reserve your spot in under a minute.
             </p>
           </div>
         </Reveal>
 
-        <div className="grid lg:grid-cols-5 gap-6">
-          {/* Calendar mock */}
-          <Reveal className="lg:col-span-2">
-            <div className="rounded-3xl border border-border/60 glass p-6 md:p-7 h-full">
-              <div className="flex items-center justify-between">
+        <Reveal>
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              className="inline-flex w-full max-w-md rounded-md border border-border/70 bg-surface p-1 sm:w-auto"
+              role="tablist"
+              aria-label="Booking type"
+            >
+              {(
+                [
+                  { id: "session" as const, label: "First Session" },
+                  { id: "consult" as const, label: "Free Consultation" },
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === tab.id}
+                  onClick={() => {
+                    onModeChange(tab.id);
+                    if (selection) onSelect({ ...selection, mode: tab.id });
+                  }}
+                  className={cn(
+                    "flex-1 rounded-md px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
+                    mode === tab.id
+                      ? "bg-flame text-background shadow-flame"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
+              Sample availability for this week — choose any slot to see how booking works. Roger
+              confirms personally.
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          <div className="mb-6 flex items-start gap-3 rounded-sm border border-border/60 bg-surface/50 px-4 py-3 md:px-5">
+            <div
+              className="grid size-9 shrink-0 place-items-center rounded-full border border-flame/30 bg-flame/15 font-display text-xs font-semibold text-flame"
+              aria-hidden
+            >
+              V
+            </div>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              <span className="font-medium text-foreground">Vanessa</span>
+              {" — "}
+              Down roughly 14 lbs with no back pain since training with Roger.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="grid gap-6 lg:grid-cols-5">
+          <Reveal className="lg:col-span-3">
+            <div className="rounded-sm border border-border/60 bg-background/80 p-5 backdrop-blur md:p-7">
+              <div className="mb-6 flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">
-                    Preferred day
-                  </div>
-                  <div className="font-display text-lg font-semibold mt-1">Next 7 days</div>
-                  <p className="text-[11px] text-muted-foreground mt-1.5 max-w-[14rem] leading-snug">
-                    Illustrative week — final time is confirmed with Alex.
+                  <div className="font-display text-lg font-semibold">Open times</div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Tap a slot to continue — Roger confirms personally.
                   </p>
                 </div>
-                <Calendar className="size-5 text-ember shrink-0" />
+                <Clock className="size-5 shrink-0 text-flame" aria-hidden />
               </div>
 
-              <div className="mt-6 grid grid-cols-7 gap-1.5">
-                {days.map((d) => (
-                  <button
-                    key={d.i}
-                    type="button"
-                    onClick={() => setSelectedDay(d.i)}
-                    className={cn(
-                      "rounded-lg py-3 flex flex-col items-center border font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                      selectedDay === d.i
-                        ? "bg-ember border-ember text-background shadow-ember"
-                        : "bg-surface-elevated border-border hover:-translate-y-0.5 hover:border-ember/40",
-                    )}
+              <div className="space-y-5">
+                {WEEK_SCHEDULE.map((d) => (
+                  <div
+                    key={d.day}
+                    className="grid gap-3 border-t border-border/50 pt-5 first:border-0 first:pt-0 sm:grid-cols-[7.5rem_1fr] sm:items-start"
                   >
-                    <span className="text-[10px] uppercase tracking-wider opacity-80">
-                      {d.weekday}
-                    </span>
-                    <span className="font-display text-lg font-semibold mt-0.5">{d.day}</span>
-                  </button>
+                    <div className="font-display text-sm font-semibold tracking-tight sm:pt-2">
+                      {d.day}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {d.times.map((t) => {
+                        const active = selection?.day === d.day && selection?.time === t;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => pickSlot(d.day, t)}
+                            className={cn(
+                              "min-h-11 rounded-md border px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                              active
+                                ? "border-flame bg-flame text-background shadow-flame"
+                                : "border-border bg-surface-elevated text-foreground hover:-translate-y-0.5 hover:border-flame/50",
+                            )}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ))}
-              </div>
-
-              <div className="mt-7">
-                <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                  Typical session times
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {slots.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setSelectedSlot(s)}
-                      className={cn(
-                        "rounded-lg py-2.5 text-sm font-semibold border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                        selectedSlot === s
-                          ? "bg-ember/15 border-ember text-ember"
-                          : "bg-surface-elevated border-border hover:-translate-y-0.5 hover:border-ember/40",
-                      )}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-7 flex items-center gap-3 rounded-xl bg-surface-elevated border border-border p-4">
-                <div className="size-9 rounded-lg bg-ember/15 grid place-items-center shrink-0">
-                  <Clock className="size-4 text-ember" />
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Included with your request:{" "}
-                  <span className="text-foreground font-medium">
-                    {days[selectedDay]!.weekday} {days[selectedDay]!.day}
-                  </span>{" "}
-                  · <span className="text-foreground font-medium">{selectedSlot}</span>
-                </div>
               </div>
             </div>
           </Reveal>
 
-          {/* Form */}
-          <Reveal delay={0.05} className="lg:col-span-3">
-            <div className="rounded-3xl border border-border/60 bg-surface p-6 md:p-8 h-full">
-              {submitted ? (
-                <div className="h-full flex flex-col items-center justify-center text-center py-10">
-                  <div className="size-14 rounded-full bg-ember/15 border border-ember/40 grid place-items-center">
-                    <CheckCircle2 className="size-7 text-ember" />
+          <Reveal delay={0.06} className="lg:col-span-2">
+            <div
+              id="booking-panel"
+              ref={formRef}
+              className="h-full scroll-mt-28 rounded-sm border border-border/60 bg-surface p-6 md:p-7"
+            >
+              {submitted && selection ? (
+                <div className="flex h-full flex-col justify-center py-6">
+                  <div className="grid size-12 place-items-center rounded-full border border-flame/40 bg-flame/15">
+                    <CheckCircle2 className="size-6 text-flame" />
                   </div>
-                  <h3 className="font-display text-2xl font-semibold mt-5">Request received.</h3>
-                  <p className="mt-2 text-muted-foreground max-w-sm">
-                    Alex will confirm by email within 24 hours with availability and next steps. No
-                    automated confirmation has been sent yet.
+                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight">
+                    Booking request received
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Here&apos;s what Roger will confirm:
                   </p>
+                  <dl className="mt-6 space-y-3 rounded-md border border-border/70 bg-background/60 p-4 text-sm">
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-muted-foreground">Type</dt>
+                      <dd className="font-medium text-foreground">{modeLabel}</dd>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <dt className="text-muted-foreground">When</dt>
+                      <dd className="font-medium text-foreground">{summary}</dd>
+                    </div>
+                    {goalLabel && (
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-muted-foreground">Goal</dt>
+                        <dd className="text-right font-medium text-foreground">{goalLabel}</dd>
+                      </div>
+                    )}
+                    {submittedValues?.name && (
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-muted-foreground">Name</dt>
+                        <dd className="font-medium text-foreground">{submittedValues.name}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+                    No commitment yet. Roger confirms the session personally.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-6 w-full border-border/80 sm:w-auto"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setSubmittedValues(null);
+                      onSelect(null);
+                      form.reset({ name: "", contact: "", goal: preferredGoal || "" });
+                    }}
+                  >
+                    Choose another time
+                  </Button>
                 </div>
               ) : (
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                  <div className="grid sm:grid-cols-2 gap-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
+                  <div className="flex items-start gap-3 rounded-md border border-flame/25 bg-flame/10 p-4">
+                    <Flame className="mt-0.5 size-5 shrink-0 text-flame" />
+                    <div>
+                      <div className="text-sm font-semibold">
+                        {selection
+                          ? `Reserving · ${modeLabel}`
+                          : `Select a time for your ${modeLabel.toLowerCase()}`}
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {selection ? (
+                          <>
+                            <span className="font-medium text-foreground">{summary}</span>
+                            {" · "}
+                            almost done
+                          </>
+                        ) : (
+                          "Your details unlock after you choose a slot."
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <fieldset
+                    disabled={!selection}
+                    className={cn("mt-6 space-y-4", !selection && "opacity-45")}
+                  >
                     <div className="space-y-2">
                       <Label htmlFor="name">Full name</Label>
                       <Input
                         id="name"
-                        placeholder="Alex Smith"
-                        className="h-11 bg-surface-elevated border-border"
+                        placeholder="Your name"
+                        className="h-11 border-border bg-surface-elevated"
                         aria-invalid={!!form.formState.errors.name}
-                        aria-describedby={form.formState.errors.name ? "name-error" : undefined}
                         {...form.register("name")}
                       />
                       {form.formState.errors.name && (
-                        <p id="name-error" className="text-xs text-destructive" role="alert">
+                        <p className="text-xs text-destructive" role="alert">
                           {form.formState.errors.name.message}
                         </p>
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="contact">Email or phone</Label>
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="you@email.com"
-                        className="h-11 bg-surface-elevated border-border"
-                        aria-invalid={!!form.formState.errors.email}
-                        aria-describedby={form.formState.errors.email ? "email-error" : undefined}
-                        {...form.register("email")}
+                        id="contact"
+                        placeholder="you@email.com or (760) 000-0000"
+                        className="h-11 border-border bg-surface-elevated"
+                        aria-invalid={!!form.formState.errors.contact}
+                        {...form.register("contact")}
                       />
-                      {form.formState.errors.email && (
-                        <p id="email-error" className="text-xs text-destructive" role="alert">
-                          {form.formState.errors.email.message}
+                      {form.formState.errors.contact && (
+                        <p className="text-xs text-destructive" role="alert">
+                          {form.formState.errors.contact.message}
                         </p>
                       )}
                     </div>
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="goal">Primary goal</Label>
                       <Controller
@@ -1378,26 +1360,27 @@ function Booking() {
                               value={field.value || undefined}
                               onValueChange={(v) => {
                                 field.onChange(v);
+                                onPreferredGoalChange(v);
                                 form.trigger("goal");
                               }}
                             >
                               <SelectTrigger
                                 id="goal"
-                                className="h-11 bg-surface-elevated border-border"
+                                className="h-11 border-border bg-surface-elevated"
                                 aria-invalid={fieldState.invalid}
-                                aria-describedby={fieldState.error ? "goal-error" : undefined}
                               >
                                 <SelectValue placeholder="Select your goal" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="fat-loss">Fat loss</SelectItem>
-                                <SelectItem value="strength">Strength & muscle</SelectItem>
-                                <SelectItem value="performance">Athletic performance</SelectItem>
-                                <SelectItem value="lifestyle">Lifestyle & health</SelectItem>
+                                {GOAL_OPTIONS.map((g) => (
+                                  <SelectItem key={g.value} value={g.value}>
+                                    {g.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             {fieldState.error && (
-                              <p id="goal-error" className="text-xs text-destructive" role="alert">
+                              <p className="text-xs text-destructive" role="alert">
                                 {fieldState.error.message}
                               </p>
                             )}
@@ -1405,93 +1388,19 @@ function Booking() {
                         )}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="type">Preferred training type</Label>
-                      <Controller
-                        name="type"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <>
-                            <Select
-                              value={field.value || undefined}
-                              onValueChange={(v) => {
-                                field.onChange(v);
-                                form.trigger("type");
-                              }}
-                            >
-                              <SelectTrigger
-                                id="type"
-                                className="h-11 bg-surface-elevated border-border"
-                                aria-invalid={fieldState.invalid}
-                                aria-describedby={fieldState.error ? "type-error" : undefined}
-                              >
-                                <SelectValue placeholder="Select training type" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="indoor">Indoor 1-on-1</SelectItem>
-                                <SelectItem value="outdoor">Outdoor strength</SelectItem>
-                                <SelectItem value="group">Small group class</SelectItem>
-                                <SelectItem value="custom">Custom program</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            {fieldState.error && (
-                              <p id="type-error" className="text-xs text-destructive" role="alert">
-                                {fieldState.error.message}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      />
-                    </div>
-                  </div>
+                  </fieldset>
 
-                  <div id="booking-consult" className="space-y-2 scroll-mt-24 md:scroll-mt-28">
-                    <Label htmlFor="message">Anything Alex should know? (optional)</Label>
-                    <Textarea
-                      id="message"
-                      rows={4}
-                      placeholder="Injuries, schedule constraints, training history…"
-                      className="bg-surface-elevated border-border resize-none"
-                      {...form.register("message")}
-                    />
-                  </div>
-
-                  <div className="rounded-xl border border-border/80 bg-surface-elevated/50 p-4 space-y-3">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Your preferred start window (updates when you change the calendar). This is
-                      sent with your request — it does not reserve a slot until Alex confirms.
-                    </p>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="preferredDaySummary">Preferred day</Label>
-                        <Input
-                          id="preferredDaySummary"
-                          readOnly
-                          tabIndex={-1}
-                          className="h-11 bg-background/80 border-border text-foreground cursor-default"
-                          {...form.register("preferredDaySummary")}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="preferredTimeSlot">Preferred time</Label>
-                        <Input
-                          id="preferredTimeSlot"
-                          readOnly
-                          tabIndex={-1}
-                          className="h-11 bg-background/80 border-border text-foreground cursor-default"
-                          {...form.register("preferredTimeSlot")}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button type="submit" size="lg" className={cn("h-12 w-full", PRIMARY_CTA_CLASS)}>
-                    Request My Session
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={!selection}
+                    className={cn("mt-6 h-12 w-full", PRIMARY_CTA_CLASS)}
+                  >
+                    {selection ? "Reserve My Session" : "Choose a Time"}
                     <ArrowRight className="size-4" />
                   </Button>
-
-                  <p className="text-xs text-center text-muted-foreground">
-                    Alex replies personally within 24 hours. Your details stay private.
+                  <p className="mt-3 text-center text-xs text-muted-foreground">
+                    No commitment. Roger confirms the session personally.
                   </p>
                 </form>
               )}
@@ -1506,12 +1415,12 @@ function Booking() {
 /* ---------------- FAQ ---------------- */
 function FAQSection() {
   return (
-    <section id="faq" className="py-24 md:py-32 relative bg-surface/30">
+    <section id="faq" className="relative bg-surface/40 py-24 md:py-32">
       <div className="mx-auto max-w-3xl px-5 md:px-8">
         <Reveal>
-          <div className="text-center mb-14">
-            <h2 className="font-display text-4xl md:text-5xl font-semibold text-balance">
-              Quick answers.
+          <div className="mb-14 text-center">
+            <h2 className="font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+              Before you book.
             </h2>
           </div>
         </Reveal>
@@ -1520,7 +1429,7 @@ function FAQSection() {
           <Accordion
             type="single"
             collapsible
-            className="rounded-2xl border border-border/60 bg-background overflow-hidden"
+            className="overflow-hidden rounded-sm border border-border/60 bg-background"
           >
             {MARKETING_FAQS.map((f, i) => (
               <AccordionItem
@@ -1528,10 +1437,10 @@ function FAQSection() {
                 value={`item-${i}`}
                 className="border-border/60 last:border-0"
               >
-                <AccordionTrigger className="px-6 py-5 text-left hover:no-underline hover:text-ember font-display text-base md:text-lg font-medium">
+                <AccordionTrigger className="px-6 py-5 text-left font-display text-base font-medium hover:text-flame hover:no-underline md:text-lg">
                   {f.q}
                 </AccordionTrigger>
-                <AccordionContent className="px-6 pb-5 text-muted-foreground leading-relaxed">
+                <AccordionContent className="px-6 pb-5 leading-relaxed text-muted-foreground">
                   {f.a}
                 </AccordionContent>
               </AccordionItem>
@@ -1543,50 +1452,76 @@ function FAQSection() {
   );
 }
 
+/* ---------------- Final CTA ---------------- */
+function FinalCta({ onBook }: { onBook: (mode: BookingMode) => void }) {
+  return (
+    <section className="relative overflow-hidden py-20 md:py-28">
+      <div className="mx-auto max-w-[84rem] px-5 md:px-8">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-sm border border-flame/35 p-8 text-center flame-glow md:p-16">
+            <img
+              src={rogerCoachImg}
+              alt=""
+              className="pointer-events-none absolute inset-0 size-full object-cover object-[center_30%] opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/88 to-background/95" />
+            <div className="relative z-10 mx-auto max-w-2xl">
+              <h2 className="font-display text-3xl font-semibold tracking-tight text-balance md:text-5xl">
+                Ready to start training?
+              </h2>
+              <p className="mt-4 font-display text-xl text-flame md:text-2xl">
+                Choose your first session today.
+              </p>
+              <ul className="mx-auto mt-8 flex max-w-md flex-col gap-2 text-sm text-muted-foreground sm:max-w-none sm:flex-row sm:justify-center sm:gap-6">
+                <li>No phone tag.</li>
+                <li>No waiting days for a reply.</li>
+                <li>No generic contact form.</li>
+              </ul>
+              <div className="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
+                  onClick={() => onBook("session")}
+                >
+                  Book Your First Session
+                  <ArrowRight className="size-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className={cn("h-12 w-full sm:w-auto", SECONDARY_CTA_CLASS)}
+                  onClick={() => onBook("consult")}
+                >
+                  Book Your Free Consultation
+                </Button>
+              </div>
+              <p className="mt-5 text-sm text-muted-foreground">
+                Roger personally confirms every booking.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- Footer ---------------- */
 function Footer() {
   return (
-    <footer className="relative border-t border-border/60 pt-20 pb-10">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <div className="rounded-3xl border border-ember/40 bg-gradient-to-br from-surface to-background p-8 md:p-14 text-center ember-glow">
-          <h3 className="font-display text-3xl md:text-5xl font-semibold max-w-2xl mx-auto text-balance">
-            Your next training block starts this week.
-          </h3>
-          <Button asChild size="lg" className={cn("mt-8 h-12", PRIMARY_CTA_CLASS)}>
-            <a href="#booking">
-              Book Your Session
-              <ArrowRight className="size-4" />
-            </a>
-          </Button>
-          <p className="mt-5 text-sm text-muted-foreground">
-            Not ready to book?{" "}
-            <a
-              href="#schedule"
-              className="text-foreground/80 underline underline-offset-4 decoration-border hover:text-ember hover:decoration-ember transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              View schedule
-            </a>
-          </p>
-        </div>
-
-        <div className="mt-16 grid md:grid-cols-4 gap-10">
+    <footer className="relative border-t border-border/60 pb-10 pt-16">
+      <div className="mx-auto max-w-[84rem] px-5 md:px-8">
+        <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2">
-              <span className="size-8 rounded-md bg-gradient-to-br from-ember to-ember-glow grid place-items-center">
-                <Flame className="size-4 text-background" strokeWidth={2.5} />
-              </span>
-              <span className="font-display text-lg font-semibold">
-                ALEX<span className="text-ember">.</span>CARTER
-              </span>
-            </div>
-            <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Personal training in Los Angeles. Indoor, outdoor, and custom coaching for expats and
-              busy professionals.
+            <img src={logoImg} alt="Incinerate" className="h-8 w-auto" width={401} height={68} />
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Elite personal training with Roger Rojas. Private gym in Kearny Mesa — sauna, cold
+              plunge, boxing, and coaching that treats you like a human being.
             </p>
           </div>
 
           <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+            <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
               Explore
             </div>
             <ul className="space-y-2.5 text-sm">
@@ -1594,7 +1529,7 @@ function Footer() {
                 <li key={n.href}>
                   <a
                     href={n.href}
-                    className="hover:text-ember transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="rounded-md transition-colors hover:text-flame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {n.label}
                   </a>
@@ -1604,38 +1539,50 @@ function Footer() {
           </div>
 
           <div>
-            <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">
+            <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
               Contact
             </div>
             <ul className="space-y-3 text-sm">
-              <li className="inline-flex items-start gap-2 text-muted-foreground">
-                <Instagram className="size-4 shrink-0 mt-0.5" aria-hidden />
-                <span>
-                  Find us on Instagram as <span className="text-foreground">@alex.carter</span>
-                  {" — "}
-                  <span className="text-muted-foreground">public profile link coming soon</span>
-                </span>
+              <li>
+                <a
+                  href="https://instagram.com/incineratefitness/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md hover:text-flame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Instagram className="size-4" />
+                  @incineratefitness
+                </a>
               </li>
               <li>
                 <a
-                  href="mailto:hello@alexcarter.la"
-                  className="inline-flex items-center gap-2 rounded-md hover:text-ember transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  href="mailto:roger@incineratefitness.com"
+                  className="inline-flex items-center gap-2 rounded-md hover:text-flame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <Mail className="size-4" />
-                  <span>hello@alexcarter.la</span>
+                  roger@incineratefitness.com
                 </a>
               </li>
-              <li className="inline-flex items-center gap-2 text-muted-foreground">
-                <MapPin className="size-4" />
-                <span>Los Angeles, CA</span>
+              <li>
+                <a
+                  href="tel:+17605955012"
+                  className="inline-flex items-center gap-2 rounded-md hover:text-flame focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <Phone className="size-4" />
+                  (760) 595-5012
+                </a>
+              </li>
+              <li className="inline-flex items-start gap-2 text-muted-foreground">
+                <MapPin className="mt-0.5 size-4 shrink-0" />
+                <span>5402 Ruffin Rd Suite 104, San Diego, CA 92123</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-14 pt-6 border-t border-border/60 flex flex-col md:flex-row gap-3 justify-between text-xs text-muted-foreground">
-          <div>© {new Date().getFullYear()} Alex Carter. All rights reserved.</div>
-          <div>Personal training · Los Angeles</div>
+        <div className="mt-14 flex flex-col justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground md:flex-row">
+          <div>© {new Date().getFullYear()} Incinerate Fitness Inc. All rights reserved.</div>
+          <div>Elite Personal Training · San Diego</div>
         </div>
       </div>
     </footer>

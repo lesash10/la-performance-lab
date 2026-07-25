@@ -1,23 +1,23 @@
 /** FAQ copy shared by the landing page and FAQPage JSON-LD. */
 export const MARKETING_FAQS = [
   {
+    q: "Do I need to fill out a contact form first?",
+    a: "No. Pick an open time below, leave your details, and reserve your spot. Roger confirms personally — you don't wait around for a reply before you can start.",
+  },
+  {
+    q: "What's the difference between a free consultation and a first session?",
+    a: "A free consultation is a goal-setting conversation (in person or phone) to map your plan. Your first training session is a full hour of coaching in the private gym — assessment included.",
+  },
+  {
     q: "Do you train beginners?",
-    a: "Yes — most clients start as beginners or returning to training. Every program is built around your current level with safe, structured progression.",
+    a: "Absolutely. Roger meets you at your level — whether you're starting fresh, coming back from injury, or preparing for a military or police academy.",
   },
   {
-    q: "Indoor or outdoor sessions?",
-    a: "Both. You can train indoors at a private gym, your building's gym, or outdoors at parks, beaches, and tracks. Choose what fits your week.",
-  },
-  {
-    q: "Which areas in LA do you cover?",
-    a: "West Hollywood, Beverly Hills, Santa Monica, Venice, and Downtown LA. Other locations available on request.",
-  },
-  {
-    q: "Do you offer custom plans?",
-    a: "Yes. Custom 4–12 week programs include programming, weekly check-ins, video feedback, and progression tracking.",
+    q: "Where is the gym?",
+    a: "Incinerate Elite Personal Training is a private facility at 5402 Ruffin Rd Suite 104, San Diego (Kearny Mesa) — with sauna, cold plunge, boxing, and outdoor training areas.",
   },
   {
     q: "How fast can I start?",
-    a: "Most clients book their first session within the same week. Reach out and Alex will confirm availability within 24 hours.",
+    a: "Most people book within the same week. Choose a time that works, reserve it, and show up ready to train.",
   },
 ] as const;
