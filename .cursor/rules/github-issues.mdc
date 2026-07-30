@@ -1,0 +1,34 @@
+---
+description: Keep GitHub Issues and milestones updated for every unit of work
+alwaysApply: true
+---
+
+# GitHub Issues discipline
+
+Follow `GITHUB_ISSUES_GUIDE.md` in the repo root for full procedure. Hard rules below always apply.
+
+## Before coding
+
+1. Confirm repo `lesash10/la-performance-lab`.
+2. Search/list open issues and milestones.
+3. Identify or **create** the tracking issue; attach an open milestone.
+4. State issue number(s), milestone, and session “done” criteria before implementing.
+
+## While working
+
+- One issue = one shippable outcome with acceptance criteria.
+- Search before create; update existing issues instead of duplicating.
+- Label every issue with one of: `enhancement`, `bug`, `documentation`, `refactor`. Add `urgent` when it blocks critical workflows.
+- Comment progress, blockers, and PR/commit links on the issue—not only in chat.
+- Split unrelated follow-ups into new issues.
+
+## Before finishing
+
+1. Update issue checkboxes/body to match reality.
+2. Close completed issues with `completed` (or `not_planned` / `duplicate` with explanation).
+3. Create follow-up issues for unfinished work.
+4. In the final reply, list issues created/updated/closed (numbers + URLs) and milestone status.
+
+## Tooling
+
+Prefer GitHub MCP (`list_issues`, `search_issues`, `issue_read`, `issue_write`, `add_issue_comment`). If unavailable, say so—do not pretend Issues were updated.
