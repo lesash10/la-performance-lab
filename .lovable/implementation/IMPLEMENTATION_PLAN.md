@@ -1194,31 +1194,29 @@ Use existing primitives for: Button, Input, Textarea, Card, Table, Dropdown, Tab
 
 ## 28. Phased implementation order
 
-### Phase 0 — Foundations
+### Phase 0 — Schema, auth & role dashboards *(revised working order)*
 
-- Gitignore env files
-- Add React Router; split landing out of mega-`App.tsx` carefully
-- Auth provider + session listener
-- Toast position top-left
-- Supabase migration pipeline (`supabase/migrations`)
+Track in [PHASE_0_FOUNDATIONS.md](./PHASE_0_FOUNDATIONS.md) / GitHub #13. Do **in this sequence**:
 
-### Phase 1 — Schema & security
+1. **Supabase + all tables** — migrations pipeline, system enums, full §8 schema, profile-on-signup trigger, baseline RLS, seed `app_settings`, regenerate types. **Promote admin manually** in Supabase (`profiles.role = 'admin'`) after tables exist — no automated bootstrap yet.
+2. **Signup / login** — React Router, auth provider + session listener, `/signup` `/login` `/logout`, brand-matched forms, toast top-left.
+3. **Roles** — load `profiles.role`, role-aware redirects, `/admin/*` and user-dashboard guards.
+4. **Mock dashboards** — minimal `/client/dashboard` + `/admin/dashboard` to verify signup, login, and role routing end-to-end.
 
-- System enums only (roles, statuses, payment, moderation actions)
-- Tables: categories, types, sessions, rules, exceptions, occurrences, bookings, histories, settings
-- Indexes, FKs, RESTRICT delete rules, checks, partial unique active bookings
-- History tables + triggers
+### Phase 1 — Schema hardening & security *(after Phase 0 tables land)*
+
+- Finish indexes, FKs, RESTRICT delete rules, checks, partial unique active bookings if not complete in Phase 0
+- History tables + triggers polish
 - RLS + helper functions + booking RPCs skeleton
-- Seed categories + session types + default `app_settings`
-- Bootstrap admin process
-- Regenerate types
+- Seed categories + session types if deferred
+- Optional: document/automate admin bootstrap later (Edge Function / one-time secret)
+- Regenerate types after any schema deltas
 
-### Phase 2 — Auth pages & profile
+### Phase 2 — Auth polish & profile
 
-- Signup/login/logout/forgot/reset/profile
-- Split name/phone/address fields + avatar path upload
+- Forgot/reset password + full `/profile` (names, phone, address, avatar path upload)
 - Login events hook
-- Role-aware redirects
+- Role-aware redirect polish
 
 ### Phase 3 — Taxonomy, definitions & occurrences
 
