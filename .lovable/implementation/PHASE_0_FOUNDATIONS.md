@@ -1,16 +1,17 @@
 # Phase 0 — Schema, auth & role dashboards
 
-**Status:** Implemented (local)  
-**GitHub issue:** [#13](https://github.com/lesash10/la-performance-lab/issues/13)  
+**Status:** Implemented (local) — profile menu, `/profile`, avatar Storage included  
+
+**GitHub issues:** [#13](https://github.com/lesash10/la-performance-lab/issues/13), [#17](https://github.com/lesash10/la-performance-lab/issues/17), [#18](https://github.com/lesash10/la-performance-lab/issues/18), [#19](https://github.com/lesash10/la-performance-lab/issues/19)  
 **Milestone:** [M0 — Foundations](https://github.com/lesash10/la-performance-lab/milestone/2)  
 **Branch:** `issue-13-phase-0-foundations`  
-**Plan reference:** [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) (schema §7–8, auth §10, routes §22, roles §23)
+**Plan reference:** [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) (schema §7–8, auth §10, storage §21, routes §22, roles §23)
 
 ---
 
 ## Goal
 
-Ship an end-to-end auth + roles vertical slice: full Supabase schema, signup/login, role handling (admin promoted manually in Supabase), mock admin and user dashboards.
+Ship an end-to-end auth + roles vertical slice: full Supabase schema, signup/login, role handling (admin promoted manually in Supabase), mock admin and user dashboards, shared profile page, and private avatar Storage with role-aware access.
 
 ## Checklist
 
@@ -45,6 +46,24 @@ Ship an end-to-end auth + roles vertical slice: full Supabase schema, signup/log
 - [x] `/admin` mock for `admin` role
 - [x] Prototype routes untouched
 
+### 5. Profile page + landing account menu
+
+- [x] Guarded `/profile` route for any authenticated role
+- [x] Profile page shows signed-in user fields (name, email, role, phone, address, status)
+- [x] Landing desktop nav: avatar button (photo if available, else initials placeholder)
+- [x] Avatar dropdown: **Profile** → `/profile`, **Dashboard** (role-aware), **Log out** (existing `signOut` unchanged)
+- [x] Dashboard link: `user` / `client` → `/dashboard`; `admin` → `/admin`
+- [x] Mobile nav: Profile + Dashboard + Log out
+
+### 6. Avatar Storage (private bucket)
+
+- [x] Private `avatars` bucket (5 MB; jpeg/png/webp/gif)
+- [x] Path convention `{userId}/{uuid}.{ext}` stored in `profiles.avatar_storage_path`
+- [x] Storage RLS: owner folder for non-admins; `is_admin()` can select/insert/update/delete all
+- [x] DB trigger rejects avatar paths outside the profile owner folder
+- [x] `/profile` upload / replace / remove UI
+- [x] Display via signed URLs (navbar + profile); initials fallback
+
 ## Manual Supabase steps (admin)
 
 After signing up your real account:
@@ -67,6 +86,8 @@ Optional (faster local testing): Supabase Dashboard → Authentication → Provi
 
 ## Out of scope (later)
 
-- Real booking RPCs, occurrence generator, Resend, Storage
+- Real booking RPCs, occurrence generator, Resend
+- Other media buckets (`coach-media`, `session-media`, `site-media`)
 - Full admin CRUD / reporting
 - Automated admin bootstrap endpoint
+- Full profile field editing (names, phone, address) — Phase 2

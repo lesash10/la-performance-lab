@@ -13,6 +13,7 @@ import IncinerateLandingPage from "@/pages/incinerate/IncinerateLandingPage";
 import { LogoutPage } from "@/pages/LogoutPage";
 import { NotAuthorizedPage } from "@/pages/NotAuthorizedPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
 import { KalosSthenosPage } from "@/pages/kalos-sthenos/KalosSthenosPage";
 import { MichaelsWellnessPage } from "@/pages/michaels-wellness/MichaelsWellnessPage";
@@ -35,6 +36,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/auth/AuthProvider";
+import { homePathForRole, useAuth } from "@/auth/AuthProvider";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -30,6 +30,7 @@ import facilityImg from "@/assets/incinerate/facility.jpg";
 import boxingImg from "@/assets/incinerate/boxing.jpg";
 import gym3 from "@/assets/incinerate/gym3.jpg";
 
+import { UserAccountMenu } from "@/components/UserAccountMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -156,7 +157,7 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavFirstLinkRef = useRef<HTMLAnchorElement>(null);
-  const homePath = profile?.role === "admin" ? "/admin" : "/dashboard";
+  const dashboardPath = homePathForRole(profile?.role);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -227,19 +228,7 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
 
         <div className="ml-auto hidden items-center gap-3 md:flex">
           {user ? (
-            <>
-              <Button asChild variant="ghost" className="h-10 px-4 text-sm text-muted-foreground hover:text-foreground">
-                <Link to={homePath}>Dashboard</Link>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 rounded-md border-border/70 px-4"
-                onClick={() => void signOut()}
-              >
-                Log out
-              </Button>
-            </>
+            <UserAccountMenu />
           ) : (
             <Button asChild variant="outline" className="h-10 rounded-md border-border/70 px-4">
               <Link to="/login">Log in</Link>
@@ -294,7 +283,12 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
             {user ? (
               <>
                 <Button asChild variant="outline" className="w-full rounded-md border-border/70">
-                  <Link to={homePath} onClick={() => setOpen(false)}>
+                  <Link to="/profile" onClick={() => setOpen(false)}>
+                    Profile
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full rounded-md border-border/70">
+                  <Link to={dashboardPath} onClick={() => setOpen(false)}>
                     Dashboard
                   </Link>
                 </Button>
