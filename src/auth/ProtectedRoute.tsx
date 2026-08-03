@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 
-import { homePathForRole, useAuth, type UserRole } from "@/auth/AuthProvider";
+import { useAuth, type UserRole } from "@/auth/AuthProvider";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -24,16 +24,16 @@ export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  if (roles && profile && !roles.includes(profile.role)) {
-    return <Navigate to={homePathForRole(profile.role)} replace />;
-  }
-
   if (roles && !profile) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         Loading profile…
       </div>
     );
+  }
+
+  if (roles && profile && !roles.includes(profile.role)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;

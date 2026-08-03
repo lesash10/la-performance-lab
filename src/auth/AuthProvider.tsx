@@ -177,3 +177,20 @@ export function homePathForRole(role: UserRole | null | undefined) {
   if (role === "admin") return "/admin";
   return "/dashboard";
 }
+
+/** Resolve a safe post-login path for the given role (blocks admin-only targets). */
+export function resolvePostAuthPath(
+  role: UserRole | null | undefined,
+  from?: string | null,
+) {
+  if (!from || from === "/login" || from === "/signup" || from === "/unauthorized") {
+    return homePathForRole(role);
+  }
+
+  const isAdminPath = from === "/admin" || from.startsWith("/admin/");
+  if (isAdminPath && role !== "admin") {
+    return "/unauthorized";
+  }
+
+  return from;
+}

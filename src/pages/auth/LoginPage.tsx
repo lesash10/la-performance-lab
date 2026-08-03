@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { homePathForRole, useAuth } from "@/auth/AuthProvider";
+import { resolvePostAuthPath, useAuth } from "@/auth/AuthProvider";
 import logoImg from "@/assets/incinerate/logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,7 @@ export function LoginPage() {
   });
 
   if (!loading && user && profile) {
-    return <Navigate to={from || homePathForRole(profile.role)} replace />;
+    return <Navigate to={resolvePostAuthPath(profile.role, from)} replace />;
   }
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -45,7 +45,7 @@ export function LoginPage() {
 
     const nextProfile = await refreshProfile();
     toast.success("Signed in");
-    navigate(from || homePathForRole(nextProfile?.role), { replace: true });
+    navigate(resolvePostAuthPath(nextProfile?.role, from), { replace: true });
     setSubmitting(false);
   });
 

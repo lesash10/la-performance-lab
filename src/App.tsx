@@ -11,6 +11,7 @@ import { SignupPage } from "@/pages/auth/SignupPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import IncinerateLandingPage from "@/pages/incinerate/IncinerateLandingPage";
 import { LogoutPage } from "@/pages/LogoutPage";
+import { NotAuthorizedPage } from "@/pages/NotAuthorizedPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePage";
 import { KalosSthenosPage } from "@/pages/kalos-sthenos/KalosSthenosPage";
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/michaels-wellness-center/" element={<MichaelsWellnessPage />} />
           <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
           <Route path="/client/dashboard" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/unauthorized" element={<NotAuthorizedPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Toaster theme="dark" position="top-left" richColors />
