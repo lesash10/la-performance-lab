@@ -1,16 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { homePathForRole, useAuth } from "@/auth/AuthProvider";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "sonner";
 import {
   ArrowRight,
-  CheckCircle2,
-  Clock,
-  Flame,
   Instagram,
   Mail,
   MapPin,
@@ -26,21 +19,13 @@ import logoImg from "@/assets/incinerate/logo.png";
 import rogerCoachImg from "@/assets/incinerate/roger-coach.jpg";
 import coachImg from "@/assets/incinerate/coach.jpg";
 import trainingImg from "@/assets/incinerate/training.jpg";
-import facilityImg from "@/assets/incinerate/facility.jpg";
 import boxingImg from "@/assets/incinerate/boxing.jpg";
 import gym3 from "@/assets/incinerate/gym3.jpg";
 
+import { BookingModal } from "@/components/booking/BookingModal";
+import { Reveal } from "@/components/marketing/Reveal";
 import { UserAccountMenu } from "@/components/UserAccountMenu";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
@@ -57,7 +42,6 @@ const NAV = [
   { href: "#programs", label: "Programs" },
   { href: "#results", label: "Results" },
   { href: "#process", label: "How It Works" },
-  { href: "#appointments", label: "Times" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -67,22 +51,6 @@ const PRIMARY_CTA_CLASS =
   "rounded-md bg-flame px-7 font-semibold tracking-[0.01em] text-background shadow-flame hover:-translate-y-0.5 hover:bg-flame/90";
 const SECONDARY_CTA_CLASS =
   "rounded-md border-border/70 bg-background/40 px-7 font-semibold tracking-[0.01em] backdrop-blur hover:-translate-y-0.5 hover:border-flame/50 hover:bg-surface-elevated hover:text-foreground";
-
-type BookingMode = "session" | "consult";
-
-type SlotSelection = {
-  day: string;
-  time: string;
-  mode: BookingMode;
-};
-
-const GOAL_OPTIONS = [
-  { value: "fat-loss", label: "Fat loss & body transformation" },
-  { value: "strength", label: "Strength & muscle" },
-  { value: "boxing", label: "Boxing & conditioning" },
-  { value: "injury", label: "Injury-smart training" },
-  { value: "assessment", label: "First session assessment" },
-] as const;
 
 const HERO_AVAILABILITY_TEASER = [
   { day: "Mon", time: "7:00 AM" },
@@ -103,15 +71,10 @@ function useLandingJsonLd() {
 
 export default function IncinerateLandingPage() {
   useLandingJsonLd();
-  const [bookingMode, setBookingMode] = useState<BookingMode>("session");
-  const [selection, setSelection] = useState<SlotSelection | null>(null);
-  const [preferredGoal, setPreferredGoal] = useState("");
+  const [bookingOpen, setBookingOpen] = useState(false);
 
-  const goBook = (mode: BookingMode, goal?: string) => {
-    setBookingMode(mode);
-    if (goal) setPreferredGoal(goal);
-    setSelection(null);
-    document.getElementById("appointments")?.scrollIntoView({ behavior: "smooth" });
+  const goBook = () => {
+    setBookingOpen(true);
   };
 
   return (
@@ -124,34 +87,21 @@ export default function IncinerateLandingPage() {
       </a>
       <Nav onBook={goBook} />
       <Hero onBook={goBook} />
-      <StickyMobileBookingCta
-        onBook={() => goBook("session")}
-        selection={selection}
-        onContinue={() => {
-          document.getElementById("booking-panel")?.scrollIntoView({ behavior: "smooth" });
-        }}
-      />
+      <StickyMobileBookingCta onBook={goBook} hidden={bookingOpen} />
       <WhyTrainHere onBook={goBook} />
       <Programs onBook={goBook} />
       <Testimonials />
       <BookingProcess onBook={goBook} />
-      <AvailableAppointments
-        mode={bookingMode}
-        onModeChange={setBookingMode}
-        selection={selection}
-        onSelect={setSelection}
-        preferredGoal={preferredGoal}
-        onPreferredGoalChange={setPreferredGoal}
-      />
       <FAQSection />
       <FinalCta onBook={goBook} />
       <Footer />
+      <BookingModal open={bookingOpen} onOpenChange={setBookingOpen} />
     </main>
   );
 }
 
 /* ---------------- Nav ---------------- */
-function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
+function Nav({ onBook }: { onBook: () => void }) {
   const { user, profile, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -234,17 +184,9 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
               <Link to="/login">Log in</Link>
             </Button>
           )}
-          <Button asChild className={cn("h-10 px-5", PRIMARY_CTA_CLASS)}>
-            <a
-              href="#appointments"
-              onClick={(e) => {
-                e.preventDefault();
-                onBook("session");
-              }}
-            >
-              Book Your First Session
-              <ArrowRight className="size-4" />
-            </a>
+          <Button className={cn("h-10 px-5", PRIMARY_CTA_CLASS)} onClick={onBook}>
+            Book Your First Session
+            <ArrowRight className="size-4" />
           </Button>
         </div>
 
@@ -311,17 +253,14 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
                 </Link>
               </Button>
             )}
-            <Button asChild className={cn("w-full", PRIMARY_CTA_CLASS)}>
-              <a
-                href="#appointments"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpen(false);
-                  onBook("session");
-                }}
-              >
-                Book Your First Session
-              </a>
+            <Button
+              className={cn("w-full", PRIMARY_CTA_CLASS)}
+              onClick={() => {
+                setOpen(false);
+                onBook();
+              }}
+            >
+              Book Your First Session
             </Button>
           </div>
         </div>
@@ -331,7 +270,7 @@ function Nav({ onBook }: { onBook: (mode: BookingMode) => void }) {
 }
 
 /* ---------------- Hero ---------------- */
-function Hero({ onBook }: { onBook: (mode: BookingMode) => void }) {
+function Hero({ onBook }: { onBook: () => void }) {
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, 70]);
@@ -407,7 +346,7 @@ function Hero({ onBook }: { onBook: (mode: BookingMode) => void }) {
           <Button
             size="lg"
             className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
-            onClick={() => onBook("session")}
+            onClick={onBook}
           >
             Book Your First Session
             <ArrowRight className="size-4" />
@@ -416,7 +355,7 @@ function Hero({ onBook }: { onBook: (mode: BookingMode) => void }) {
             size="lg"
             variant="outline"
             className={cn("h-12 w-full sm:w-auto", SECONDARY_CTA_CLASS)}
-            onClick={() => onBook("consult")}
+            onClick={onBook}
           >
             Book Your Free Consultation
           </Button>
@@ -424,7 +363,7 @@ function Hero({ onBook }: { onBook: (mode: BookingMode) => void }) {
 
         <button
           type="button"
-          onClick={() => onBook("session")}
+          onClick={onBook}
           className="mt-8 flex w-full max-w-lg flex-col items-center justify-center gap-2 rounded-md border border-border/50 bg-background/35 px-4 py-3 text-center backdrop-blur-sm transition-colors hover:border-flame/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:gap-3"
         >
           <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-flame">
@@ -459,12 +398,10 @@ const STICKY_BOOKING_DISMISS_KEY = "incinerate-sticky-booking-dismiss";
 
 function StickyMobileBookingCta({
   onBook,
-  selection,
-  onContinue,
+  hidden = false,
 }: {
   onBook: () => void;
-  selection: SlotSelection | null;
-  onContinue: () => void;
+  hidden?: boolean;
 }) {
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -475,13 +412,10 @@ function StickyMobileBookingCta({
     }
   });
   const [visible, setVisible] = useState(false);
-  const [panelOnScreen, setPanelOnScreen] = useState(false);
 
   useEffect(() => {
     const update = () => {
       const hero = document.getElementById("top");
-      const booking = document.getElementById("appointments");
-      const panel = document.getElementById("booking-panel");
       const vh = window.innerHeight;
       let pastHero = false;
       if (hero) {
@@ -489,19 +423,7 @@ function StickyMobileBookingCta({
       } else {
         pastHero = window.scrollY > vh * 0.55;
       }
-      let bookingOnScreen = false;
-      if (booking) {
-        const br = booking.getBoundingClientRect();
-        bookingOnScreen = br.top < vh * 0.88 && br.bottom > vh * 0.12;
-      }
-      let panelVisible = false;
-      if (panel) {
-        const pr = panel.getBoundingClientRect();
-        panelVisible = pr.top < vh * 0.75 && pr.bottom > vh * 0.2;
-      }
-      setPanelOnScreen(panelVisible);
-      // Show when past hero; if a slot is selected, stay visible until the form panel is on screen
-      setVisible(pastHero && (selection ? !panelVisible : !bookingOnScreen));
+      setVisible(pastHero);
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -510,7 +432,7 @@ function StickyMobileBookingCta({
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [selection]);
+  }, []);
 
   const dismiss = () => {
     try {
@@ -521,9 +443,7 @@ function StickyMobileBookingCta({
     setDismissed(true);
   };
 
-  if (dismissed) return null;
-
-  const hasSelection = !!selection;
+  if (dismissed || hidden) return null;
 
   return (
     <div
@@ -536,66 +456,27 @@ function StickyMobileBookingCta({
       <div className="mx-auto flex max-w-lg items-stretch gap-2 rounded-2xl border border-border/70 bg-background/95 p-2 pl-3 shadow-lg shadow-black/30 backdrop-blur-xl">
         <button
           type="button"
-          onClick={hasSelection ? onContinue : onBook}
+          onClick={onBook}
           className="flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-flame px-4 py-3 text-sm font-semibold tracking-[0.01em] text-background shadow-flame transition-all hover:-translate-y-0.5 hover:bg-flame/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          {hasSelection ? (
-            <span className="truncate">
-              Selected: {selection.day.slice(0, 3)} {selection.time}
-            </span>
-          ) : (
-            <span>Book Your First Session</span>
-          )}
+          <span>Book Your First Session</span>
           <ArrowRight className="size-4 shrink-0" aria-hidden />
         </button>
-        {!hasSelection && (
-          <button
-            type="button"
-            onClick={dismiss}
-            className="grid size-11 shrink-0 place-items-center rounded-lg border border-border/60 text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label="Dismiss booking shortcut"
-          >
-            <X className="size-5" aria-hidden />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={dismiss}
+          className="grid size-11 shrink-0 place-items-center rounded-lg border border-border/60 text-muted-foreground transition-all hover:-translate-y-0.5 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          aria-label="Dismiss booking shortcut"
+        >
+          <X className="size-5" aria-hidden />
+        </button>
       </div>
-      {hasSelection && !panelOnScreen && (
-        <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-          Tap to finish reserving
-        </p>
-      )}
     </div>
   );
 }
 
-function Reveal({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease: "easeOut", delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 /* ---------------- Why Train Here ---------------- */
-function WhyTrainHere({ onBook }: { onBook: (mode: BookingMode) => void }) {
+function WhyTrainHere({ onBook }: { onBook: () => void }) {
   const credentials = [
     "18+ years of elite coaching",
     "United States Marine veteran",
@@ -690,7 +571,7 @@ function WhyTrainHere({ onBook }: { onBook: (mode: BookingMode) => void }) {
               <Button
                 size="lg"
                 className={cn("mt-10 h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
-                onClick={() => onBook("session")}
+                onClick={onBook}
               >
                 Book Your First Session
                 <ArrowRight className="size-4" />
@@ -704,7 +585,7 @@ function WhyTrainHere({ onBook }: { onBook: (mode: BookingMode) => void }) {
 }
 
 /* ---------------- Programs ---------------- */
-function Programs({ onBook }: { onBook: (mode: BookingMode, goal?: string) => void }) {
+function Programs({ onBook }: { onBook: () => void }) {
   const programs = [
     {
       img: coachImg,
@@ -776,7 +657,7 @@ function Programs({ onBook }: { onBook: (mode: BookingMode, goal?: string) => vo
                   <Button
                     variant="outline"
                     className="mt-6 w-full border-border/80 bg-transparent hover:border-flame hover:bg-flame hover:text-background sm:w-auto"
-                    onClick={() => onBook("session", p.goal)}
+                    onClick={onBook}
                   >
                     Reserve Your Spot
                     <ArrowRight className="size-4" />
@@ -873,17 +754,17 @@ function Testimonials() {
 }
 
 /* ---------------- Simple Booking Process ---------------- */
-function BookingProcess({ onBook }: { onBook: (mode: BookingMode) => void }) {
+function BookingProcess({ onBook }: { onBook: () => void }) {
   const steps = [
     {
       n: "01",
-      title: "Pick a time",
-      desc: "Browse open slots this week and tap the one that fits your schedule.",
+      title: "Share a few details",
+      desc: "Name, email, and a quick sense of your goal — so Roger knows who he’s meeting.",
     },
     {
       n: "02",
-      title: "Reserve your spot",
-      desc: "Leave your name, contact, and goal. Takes under a minute.",
+      title: "Pick a time",
+      desc: "Choose an open slot in the calendar. Your info is already filled in.",
     },
     {
       n: "03",
@@ -902,7 +783,7 @@ function BookingProcess({ onBook }: { onBook: (mode: BookingMode) => void }) {
               Booking takes minutes, not days.
             </h2>
             <p className="mt-5 text-muted-foreground">
-              Choose a time below and start this week — no generic contact form required.
+              Start with Book Your First Session — stay on this page the whole way through.
             </p>
           </div>
         </Reveal>
@@ -928,413 +809,13 @@ function BookingProcess({ onBook }: { onBook: (mode: BookingMode) => void }) {
             <Button
               size="lg"
               className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
-              onClick={() => onBook("session")}
+              onClick={onBook}
             >
-              Choose a Time
+              Book Your First Session
               <ArrowRight className="size-4" />
             </Button>
           </div>
         </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- Available Appointments ---------------- */
-const WEEK_SCHEDULE = [
-  { day: "Monday", times: ["7:00 AM", "12:00 PM", "5:30 PM"] },
-  { day: "Tuesday", times: ["8:00 AM", "1:00 PM", "6:00 PM"] },
-  { day: "Wednesday", times: ["9:30 AM", "4:30 PM"] },
-  { day: "Thursday", times: ["7:00 AM", "5:00 PM"] },
-  { day: "Friday", times: ["8:00 AM", "12:00 PM", "4:30 PM"] },
-] as const;
-
-const formSchema = z
-  .object({
-    name: z.string().min(2, "Please enter your full name"),
-    contact: z.string().min(5, "Enter an email or phone number"),
-    goal: z.string().min(1, "Pick a primary goal"),
-  })
-  .superRefine((data, ctx) => {
-    const value = data.contact.trim();
-    const looksLikeEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    const looksLikePhone =
-      /^[\d\s()+.-]{7,}$/.test(value) && /\d{7,}/.test(value.replace(/\D/g, ""));
-    if (!looksLikeEmail && !looksLikePhone) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["contact"],
-        message: "Enter a valid email or phone number",
-      });
-    }
-  });
-type FormValues = z.infer<typeof formSchema>;
-
-function AvailableAppointments({
-  mode,
-  onModeChange,
-  selection,
-  onSelect,
-  preferredGoal,
-  onPreferredGoalChange,
-}: {
-  mode: BookingMode;
-  onModeChange: (m: BookingMode) => void;
-  selection: SlotSelection | null;
-  onSelect: (s: SlotSelection | null) => void;
-  preferredGoal: string;
-  onPreferredGoalChange: (goal: string) => void;
-}) {
-  const [submitted, setSubmitted] = useState(false);
-  const [submittedValues, setSubmittedValues] = useState<FormValues | null>(null);
-  const formRef = useRef<HTMLDivElement>(null);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: "", contact: "", goal: preferredGoal || "" },
-  });
-
-  const { control, setValue } = form;
-  const modeLabel = mode === "session" ? "First Session" : "Free Consultation";
-
-  useEffect(() => {
-    if (!preferredGoal) return;
-    setValue("goal", preferredGoal, { shouldValidate: true });
-  }, [preferredGoal, setValue]);
-
-  const pickSlot = (day: string, time: string) => {
-    onSelect({ day, time, mode });
-    setSubmitted(false);
-    setSubmittedValues(null);
-    queueMicrotask(() => {
-      formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
-  };
-
-  const onSubmit = (values: FormValues) => {
-    if (!selection) return;
-    setSubmittedValues(values);
-    setSubmitted(true);
-    onPreferredGoalChange(values.goal);
-    toast.success("Session reserved", {
-      description: `${selection.day} at ${selection.time} · Roger will confirm personally.`,
-    });
-  };
-
-  const summary = useMemo(() => {
-    if (!selection) return null;
-    return `${selection.day} · ${selection.time}`;
-  }, [selection]);
-
-  const goalLabel = useMemo(() => {
-    const value = submittedValues?.goal || preferredGoal;
-    return GOAL_OPTIONS.find((g) => g.value === value)?.label;
-  }, [submittedValues, preferredGoal]);
-
-  return (
-    <section id="appointments" className="relative overflow-hidden py-24 md:py-32">
-      <div className="pointer-events-none absolute inset-0">
-        <img
-          src={facilityImg}
-          alt=""
-          width={1067}
-          height={1600}
-          loading="lazy"
-          className="absolute inset-0 size-full object-cover opacity-[0.12]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-[84rem] px-5 md:px-8">
-        <Reveal>
-          <div className="mb-10 max-w-2xl">
-            <p className="text-xs font-medium uppercase tracking-[0.24em] text-flame">
-              Available this week
-            </p>
-            <h2 className="mt-4 font-display text-4xl font-semibold tracking-tight text-balance md:text-5xl">
-              Choose Your First Session
-            </h2>
-            <p className="mt-5 text-muted-foreground">
-              Select an available time and reserve your spot in under a minute.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div
-              className="inline-flex w-full max-w-md rounded-md border border-border/70 bg-surface p-1 sm:w-auto"
-              role="tablist"
-              aria-label="Booking type"
-            >
-              {(
-                [
-                  { id: "session" as const, label: "First Session" },
-                  { id: "consult" as const, label: "Free Consultation" },
-                ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={mode === tab.id}
-                  onClick={() => {
-                    onModeChange(tab.id);
-                    if (selection) onSelect({ ...selection, mode: tab.id });
-                  }}
-                  className={cn(
-                    "flex-1 rounded-md px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
-                    mode === tab.id
-                      ? "bg-flame text-background shadow-flame"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <p className="max-w-sm text-xs leading-relaxed text-muted-foreground">
-              Sample availability for this week — choose any slot to see how booking works. Roger
-              confirms personally.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div className="mb-6 flex items-start gap-3 rounded-sm border border-border/60 bg-surface/50 px-4 py-3 md:px-5">
-            <div
-              className="grid size-9 shrink-0 place-items-center rounded-full border border-flame/30 bg-flame/15 font-display text-xs font-semibold text-flame"
-              aria-hidden
-            >
-              V
-            </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              <span className="font-medium text-foreground">Vanessa</span>
-              {" — "}
-              Down roughly 14 lbs with no back pain since training with Roger.
-            </p>
-          </div>
-        </Reveal>
-
-        <div className="grid gap-6 lg:grid-cols-5">
-          <Reveal className="lg:col-span-3">
-            <div className="rounded-sm border border-border/60 bg-background/80 p-5 backdrop-blur md:p-7">
-              <div className="mb-6 flex items-center justify-between gap-3">
-                <div>
-                  <div className="font-display text-lg font-semibold">Open times</div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Tap a slot to continue — Roger confirms personally.
-                  </p>
-                </div>
-                <Clock className="size-5 shrink-0 text-flame" aria-hidden />
-              </div>
-
-              <div className="space-y-5">
-                {WEEK_SCHEDULE.map((d) => (
-                  <div
-                    key={d.day}
-                    className="grid gap-3 border-t border-border/50 pt-5 first:border-0 first:pt-0 sm:grid-cols-[7.5rem_1fr] sm:items-start"
-                  >
-                    <div className="font-display text-sm font-semibold tracking-tight sm:pt-2">
-                      {d.day}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {d.times.map((t) => {
-                        const active = selection?.day === d.day && selection?.time === t;
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            onClick={() => pickSlot(d.day, t)}
-                            className={cn(
-                              "min-h-11 rounded-md border px-4 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                              active
-                                ? "border-flame bg-flame text-background shadow-flame"
-                                : "border-border bg-surface-elevated text-foreground hover:-translate-y-0.5 hover:border-flame/50",
-                            )}
-                          >
-                            {t}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.06} className="lg:col-span-2">
-            <div
-              id="booking-panel"
-              ref={formRef}
-              className="h-full scroll-mt-28 rounded-sm border border-border/60 bg-surface p-6 md:p-7"
-            >
-              {submitted && selection ? (
-                <div className="flex h-full flex-col justify-center py-6">
-                  <div className="grid size-12 place-items-center rounded-full border border-flame/40 bg-flame/15">
-                    <CheckCircle2 className="size-6 text-flame" />
-                  </div>
-                  <h3 className="mt-5 font-display text-2xl font-semibold tracking-tight">
-                    Booking request received
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Here&apos;s what Roger will confirm:
-                  </p>
-                  <dl className="mt-6 space-y-3 rounded-md border border-border/70 bg-background/60 p-4 text-sm">
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-muted-foreground">Type</dt>
-                      <dd className="font-medium text-foreground">{modeLabel}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-muted-foreground">When</dt>
-                      <dd className="font-medium text-foreground">{summary}</dd>
-                    </div>
-                    {goalLabel && (
-                      <div className="flex justify-between gap-4">
-                        <dt className="text-muted-foreground">Goal</dt>
-                        <dd className="text-right font-medium text-foreground">{goalLabel}</dd>
-                      </div>
-                    )}
-                    {submittedValues?.name && (
-                      <div className="flex justify-between gap-4">
-                        <dt className="text-muted-foreground">Name</dt>
-                        <dd className="font-medium text-foreground">{submittedValues.name}</dd>
-                      </div>
-                    )}
-                  </dl>
-                  <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-                    No commitment yet. Roger confirms the session personally.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-6 w-full border-border/80 sm:w-auto"
-                    onClick={() => {
-                      setSubmitted(false);
-                      setSubmittedValues(null);
-                      onSelect(null);
-                      form.reset({ name: "", contact: "", goal: preferredGoal || "" });
-                    }}
-                  >
-                    Choose another time
-                  </Button>
-                </div>
-              ) : (
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
-                  <div className="flex items-start gap-3 rounded-md border border-flame/25 bg-flame/10 p-4">
-                    <Flame className="mt-0.5 size-5 shrink-0 text-flame" />
-                    <div>
-                      <div className="text-sm font-semibold">
-                        {selection
-                          ? `Reserving · ${modeLabel}`
-                          : `Select a time for your ${modeLabel.toLowerCase()}`}
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {selection ? (
-                          <>
-                            <span className="font-medium text-foreground">{summary}</span>
-                            {" · "}
-                            almost done
-                          </>
-                        ) : (
-                          "Your details unlock after you choose a slot."
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <fieldset
-                    disabled={!selection}
-                    className={cn("mt-6 space-y-4", !selection && "opacity-45")}
-                  >
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full name</Label>
-                      <Input
-                        id="name"
-                        placeholder="Your name"
-                        className="h-11 border-border bg-surface-elevated"
-                        aria-invalid={!!form.formState.errors.name}
-                        {...form.register("name")}
-                      />
-                      {form.formState.errors.name && (
-                        <p className="text-xs text-destructive" role="alert">
-                          {form.formState.errors.name.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="contact">Email or phone</Label>
-                      <Input
-                        id="contact"
-                        placeholder="you@email.com or (760) 000-0000"
-                        className="h-11 border-border bg-surface-elevated"
-                        aria-invalid={!!form.formState.errors.contact}
-                        {...form.register("contact")}
-                      />
-                      {form.formState.errors.contact && (
-                        <p className="text-xs text-destructive" role="alert">
-                          {form.formState.errors.contact.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="goal">Primary goal</Label>
-                      <Controller
-                        name="goal"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                          <>
-                            <Select
-                              value={field.value || undefined}
-                              onValueChange={(v) => {
-                                field.onChange(v);
-                                onPreferredGoalChange(v);
-                                form.trigger("goal");
-                              }}
-                            >
-                              <SelectTrigger
-                                id="goal"
-                                className="h-11 border-border bg-surface-elevated"
-                                aria-invalid={fieldState.invalid}
-                              >
-                                <SelectValue placeholder="Select your goal" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {GOAL_OPTIONS.map((g) => (
-                                  <SelectItem key={g.value} value={g.value}>
-                                    {g.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            {fieldState.error && (
-                              <p className="text-xs text-destructive" role="alert">
-                                {fieldState.error.message}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      />
-                    </div>
-                  </fieldset>
-
-                  <Button
-                    type="submit"
-                    size="lg"
-                    disabled={!selection}
-                    className={cn("mt-6 h-12 w-full", PRIMARY_CTA_CLASS)}
-                  >
-                    {selection ? "Reserve My Session" : "Choose a Time"}
-                    <ArrowRight className="size-4" />
-                  </Button>
-                  <p className="mt-3 text-center text-xs text-muted-foreground">
-                    No commitment. Roger confirms the session personally.
-                  </p>
-                </form>
-              )}
-            </div>
-          </Reveal>
-        </div>
       </div>
     </section>
   );
@@ -1381,7 +862,7 @@ function FAQSection() {
 }
 
 /* ---------------- Final CTA ---------------- */
-function FinalCta({ onBook }: { onBook: (mode: BookingMode) => void }) {
+function FinalCta({ onBook }: { onBook: () => void }) {
   return (
     <section className="relative overflow-hidden py-20 md:py-28">
       <div className="mx-auto max-w-[84rem] px-5 md:px-8">
@@ -1409,7 +890,7 @@ function FinalCta({ onBook }: { onBook: (mode: BookingMode) => void }) {
                 <Button
                   size="lg"
                   className={cn("h-12 w-full sm:w-auto", PRIMARY_CTA_CLASS)}
-                  onClick={() => onBook("session")}
+                  onClick={onBook}
                 >
                   Book Your First Session
                   <ArrowRight className="size-4" />
@@ -1418,7 +899,7 @@ function FinalCta({ onBook }: { onBook: (mode: BookingMode) => void }) {
                   size="lg"
                   variant="outline"
                   className={cn("h-12 w-full sm:w-auto", SECONDARY_CTA_CLASS)}
-                  onClick={() => onBook("consult")}
+                  onClick={onBook}
                 >
                   Book Your Free Consultation
                 </Button>

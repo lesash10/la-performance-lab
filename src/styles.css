@@ -155,6 +155,16 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /*
+   * Parent-page only: our html uses color-scheme: dark; Calendly’s document is light.
+   * Aligning the iframe element prevents browsers from painting an opaque white canvas
+   * behind the embed. This does not style Calendly’s internal form controls.
+   */
+  .calendly-inline-widget iframe {
+    color-scheme: light;
+    background-color: transparent;
+  }
+
   ::selection {
     background-color: color-mix(in oklab, var(--flame) 40%, transparent);
     color: var(--foreground);
