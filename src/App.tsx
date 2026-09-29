@@ -18,6 +18,7 @@ import { OneRMPerformancePage } from "@/pages/1rm-performance/OneRMPerformancePa
 import { KalosSthenosPage } from "@/pages/kalos-sthenos/KalosSthenosPage";
 import { MichaelsWellnessPage } from "@/pages/michaels-wellness/MichaelsWellnessPage";
 import { SpryPrototypePage } from "@/pages/spry-fitness/SpryPrototypePage";
+import { BfitPage } from "@/pages/bfit/BfitPage";
 import { TridentFitnessPage } from "@/pages/trident-fitness/TridentFitnessPage";
 
 export default function App() {
@@ -56,6 +57,8 @@ export default function App() {
             }
           />
           {/* Prototype brand routes — untouched behavior */}
+          <Route path="/brook-bfit" element={<BfitPage />} />
+          <Route path="/brook-bfit/" element={<BfitPage />} />
           <Route path="/trident" element={<TridentFitnessPage />} />
           <Route path="/trident/" element={<TridentFitnessPage />} />
           <Route path="/1rm-performance" element={<OneRMPerformancePage />} />

@@ -40,6 +40,7 @@ There is **no React Router** — routing is a pathname switch in `src/App.tsx` p
 | `/spry`, `/spry-fitness-prototype` | Spry Fitness prototype |
 | `/kalos`, `/kalos-sthenos` | Kalos Sthenos prototype |
 | `/michaels-wellness`, `/michaels-wellness-center` | Michael’s Wellness Center prototype |
+| `/brook-bfit` | Brook Ryan / bFIT prototype |
 
 Unknown paths render a simple 404.
 

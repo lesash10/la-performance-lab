@@ -1,0 +1,95 @@
+.bfit {
+  --bfit-paper: #f3f1ec;
+  --bfit-ink: #141414;
+  --bfit-muted: #5c574f;
+  --bfit-stone: #8a8178;
+  --bfit-line: rgba(20, 20, 20, 0.14);
+  background: var(--bfit-paper);
+  color: var(--bfit-ink);
+  font-family: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  min-height: 100svh;
+}
+
+html:has(.bfit),
+html:has(.bfit) body {
+  background: #f3f1ec;
+  color: #141414;
+  color-scheme: light;
+}
+
+.bfit ::selection {
+  background: #141414;
+  color: #f3f1ec;
+}
+
+.bfit-serif {
+  font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.bfit-hero-media {
+  order: -1;
+  min-height: 34svh;
+}
+
+@media (min-width: 1024px) {
+  .bfit-hero-media {
+    order: 2;
+    min-height: 100%;
+  }
+}
+
+.bfit-slot {
+  background:
+    radial-gradient(120% 80% at 70% 20%, rgba(243, 241, 236, 0.08), transparent 55%),
+    linear-gradient(165deg, #1c1c1c 0%, #2c2926 58%, #171717 100%);
+}
+
+.bfit-slot-light {
+  background:
+    linear-gradient(180deg, rgba(20, 20, 20, 0.03), rgba(20, 20, 20, 0.01)),
+    #e6e1d8;
+}
+
+.bfit-dialog[data-state="open"] {
+  animation: bfit-panel-in 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bfit-dialog > button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  color: #141414;
+  opacity: 1;
+}
+
+@keyframes bfit-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(1.5rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 639px) {
+  @keyframes bfit-panel-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bfit-dialog[data-state="open"] {
+    animation: none;
+  }
+}
